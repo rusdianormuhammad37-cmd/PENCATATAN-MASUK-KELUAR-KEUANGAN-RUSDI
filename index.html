@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Catatan Keuangan</title>
+    <!-- Import Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Import Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3b82f6', // blue-500
+                        success: '#10b981', // emerald-500
+                        danger: '#ef4444',  // red-500
+                        dark: '#1e293b',    // slate-800
+                        light: '#f8fafc',   // slate-50
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f1f5f9;
+        }
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="text-slate-700 font-sans antialiased">
+
+<div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-primary">
+                <i class="fa-solid fa-wallet text-2xl"></i>
+                <h1 class="text-xl font-bold tracking-tight">Buku Kas Kita</h1>
+            </div>
+            <div class="text-sm text-slate-500" id="currentDateDisplay">
+                <!-- Date will be injected here -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 flex flex-col gap-6">
+        
+        <!-- Summary Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Total Balance -->
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100 flex flex-col justify-between h-full relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-scale-balanced text-5xl text-primary"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-slate-500 mb-1">Total Saldo</p>
+                    <h2 class="text-3xl font-bold text-slate-800" id="totalBalance">Rp 0</h2>
+                </div>
+                <div class="mt-4 text-xs text-slate-400 filter-label">Semua Waktu</div>
+            </div>
+
+            <!-- Total Income -->
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100 flex flex-col justify-between h-full relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-arrow-trend-up text-5xl text-success"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-slate-500 mb-1">Pemasukan</p>
+                    <h2 class="text-2xl font-bold text-success" id="totalIncome">Rp 0</h2>
+                </div>
+                <div class="mt-4 text-xs text-slate-400 filter-label">Semua Waktu</div>
+            </div>
+
+            <!-- Total Expense -->
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-100 flex flex-col justify-between h-full relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="fa-solid fa-arrow-trend-down text-5xl text-danger"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-slate-500 mb-1">Pengeluaran</p>
+                    <h2 class="text-2xl font-bold text-danger" id="totalExpense">Rp 0</h2>
+                </div>
+                <div class="mt-4 text-xs text-slate-400 filter-label">Semua Waktu</div>
+            </div>
+        </section>
+
+        <!-- Controls: Filters and Add Button -->
+        <section class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+            <!-- Time Filters -->
+            <div class="flex bg-slate-100 p-1 rounded-lg w-full sm:w-auto">
+                <button onclick="setFilter('all')" id="btnFilter-all" class="flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors bg-white shadow-sm text-primary">Semua</button>
+                <button onclick="setFilter('month')" id="btnFilter-month" class="flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors text-slate-500 hover:text-slate-700">Bulan Ini</button>
+                <button onclick="setFilter('week')" id="btnFilter-week" class="flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors text-slate-500 hover:text-slate-700">Minggu Ini</button>
+            </div>
+
+            <!-- Add Button -->
+            <button onclick="openModal()" class="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plus"></i>
+                <span>Tambah Transaksi</span>
+            </button>
+        </section>
+
+        <!-- Transactions List -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden flex-grow flex flex-col">
+            <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-semibold text-slate-800">Riwayat Transaksi</h3>
+                <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded-full" id="transactionCount">0 item</span>
+            </div>
+            
+            <div class="overflow-x-auto flex-grow">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white border-b border-slate-100 text-xs uppercase text-slate-400 font-semibold tracking-wider">
+                            <th class="px-5 py-3">Tanggal</th>
+                            <th class="px-5 py-3">Deskripsi</th>
+                            <th class="px-5 py-3 text-right">Jumlah (Rp)</th>
+                            <th class="px-5 py-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionList" class="divide-y divide-slate-100">
+                        <!-- Transactions will be rendered here dynamically -->
+                        <tr id="emptyState" class="hidden">
+                            <td colspan="4" class="px-5 py-12 text-center text-slate-400">
+                                <i class="fa-solid fa-receipt text-4xl mb-3 text-slate-300"></i>
+                                <p>Belum ada transaksi pada periode ini.</p>
+                                <p class="text-sm mt-1">Klik "Tambah Transaksi" untuk memulai.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-sm text-slate-400">
+        <p>Buku Kas Kita &copy; <span id="currentYear"></span></p>
+    </footer>
+</div>
+
+<!-- Modal Overlay for Adding Transaction -->
+<div id="transactionModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex justify-center items-end sm:items-center p-4 transition-opacity opacity-0">
+    
+    <!-- Modal Content -->
+    <div class="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-transform translate-y-full sm:translate-y-4" id="modalContent">
+        
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-800">Tambah Transaksi</h3>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors rounded-full p-1 hover:bg-slate-100">
+                <i class="fa-solid fa-xmark text-xl w-6 h-6 flex items-center justify-center"></i>
+            </button>
+        </div>
+
+        <form id="transactionForm" class="p-6">
+            <!-- Type Selector (Income/Expense) -->
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Jenis Transaksi</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="type" value="income" class="peer sr-only" checked>
+                        <div class="text-center py-2 px-4 rounded-lg border-2 border-slate-200 peer-checked:border-success peer-checked:bg-emerald-50 peer-checked:text-success text-slate-500 font-medium transition-all">
+                            <i class="fa-solid fa-arrow-down mr-1"></i> Pemasukan
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="type" value="expense" class="peer sr-only">
+                        <div class="text-center py-2 px-4 rounded-lg border-2 border-slate-200 peer-checked:border-danger peer-checked:bg-red-50 peer-checked:text-danger text-slate-500 font-medium transition-all">
+                            <i class="fa-solid fa-arrow-up mr-1"></i> Pengeluaran
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Amount Input -->
+            <div class="mb-4">
+                <label for="amount" class="block text-sm font-medium text-slate-700 mb-1">Jumlah (Rp)</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 font-medium">
+                        Rp
+                    </div>
+                    <input type="text" id="amount" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-primary focus:border-primary sm:text-lg transition-colors placeholder:text-slate-300" placeholder="0" oninput="formatRupiahInput(this)">
+                </div>
+            </div>
+
+            <!-- Description Input -->
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-slate-700 mb-1">Keterangan</label>
+                <input type="text" id="description" required class="block w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-primary focus:border-primary transition-colors" placeholder="Misal: Gaji bulanan, Beli makan...">
+            </div>
+
+            <!-- Date Input -->
+            <div class="mb-6">
+                <label for="date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal</label>
+                <input type="date" id="date" required class="block w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-primary focus:border-primary transition-colors text-slate-700">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Simpan Transaksi
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Custom Confirmation Modal for Deletion -->
+<div id="confirmModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] hidden flex justify-center items-center p-4 transition-opacity opacity-0">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden transform transition-transform scale-95" id="confirmContent">
+        <div class="p-6 text-center">
+            <div class="w-16 h-16 rounded-full bg-red-100 text-danger flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Hapus Transaksi?</h3>
+            <p class="text-sm text-slate-500 mb-6">Tindakan ini tidak dapat dibatalkan. Transaksi akan dihapus secara permanen dari catatan Anda.</p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirmModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-lg transition-colors">
+                    Batal
+                </button>
+                <button id="confirmDeleteBtn" class="flex-1 bg-danger hover:bg-red-600 text-white font-medium py-2.5 rounded-lg shadow-sm transition-colors">
+                    Ya, Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- State Management ---
+    // Try to load existing data from LocalStorage, otherwise start empty
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    let currentFilter = 'all'; // 'all', 'month', 'week'
+    let transactionToDeleteId = null;
+
+    // --- Helper Functions ---
+
+    // Format number to Indonesian Rupiah currency string
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(number);
+    }
+
+    // Unformat string back to number
+    function parseRupiah(rupiahString) {
+        return parseInt(rupiahString.replace(/[^,\d]/g, ''), 10) || 0;
+    }
+
+    // Real-time formatting for the amount input field
+    function formatRupiahInput(input) {
+        let value = input.value.replace(/[^,\d]/g, ''); // Remove non-digits
+        if (value) {
+            // Format as number with dots
+            input.value = new Intl.NumberFormat('id-ID').format(parseInt(value, 10));
+        } else {
+            input.value = '';
+        }
+    }
+
+    // Generate a unique ID for new transactions
+    function generateId() {
+        return Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+    }
+
+    // Check if a date falls within the current week
+    function isThisWeek(dateString) {
+        const today = new Date();
+        const date = new Date(dateString);
+        
+        // Reset times to midnight for accurate day comparison
+        today.setHours(0, 0, 0, 0);
+        date.setHours(0, 0, 0, 0);
+
+        // Get the first day of the current week (Sunday)
+        const firstDayOfWeek = new Date(today);
+        firstDayOfWeek.setDate(today.getDate() - today.getDay());
+
+        // Get the last day of the current week (Saturday)
+        const lastDayOfWeek = new Date(today);
+        lastDayOfWeek.setDate(today.getDate() - today.getDay() + 6);
+
+        return date >= firstDayOfWeek && date <= lastDayOfWeek;
+    }
+
+    // Check if a date falls within the current month
+    function isThisMonth(dateString) {
+        const today = new Date();
+        const date = new Date(dateString);
+        return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+    }
+
+    // Save current transactions array to browser LocalStorage
+    function saveToLocalStorage() {
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+
+    // --- UI Updating Functions ---
+
+    // Update the dashboard summary cards based on filtered transactions
+    function updateSummary(filteredTransactions) {
+        let income = 0;
+        let expense = 0;
+
+        filteredTransactions.forEach(t => {
+            if (t.type === 'income') {
+                income += t.amount;
+            } else {
+                expense += t.amount;
+            }
+        });
+
+        const balance = income - expense;
+
+        document.getElementById('totalBalance').innerText = formatRupiah(balance);
+        // Change color based on positive/negative balance
+        if(balance < 0) {
+            document.getElementById('totalBalance').classList.remove('text-slate-800');
+            document.getElementById('totalBalance').classList.add('text-danger');
+        } else {
+            document.getElementById('totalBalance').classList.remove('text-danger');
+            document.getElementById('totalBalance').classList.add('text-slate-800');
+        }
+
+        document.getElementById('totalIncome').innerText = formatRupiah(income);
+        document.getElementById('totalExpense').innerText = formatRupiah(expense);
+        
+        // Update labels on cards to reflect current filter
+        let filterText = 'Semua Waktu';
+        if(currentFilter === 'month') filterText = 'Bulan Ini';
+        if(currentFilter === 'week') filterText = 'Minggu Ini';
+        
+        document.querySelectorAll('.filter-label').forEach(el => {
+            el.innerText = filterText;
+        });
+    }
+
+    // Render the table rows based on filtered transactions
+    function updateTransactionList(filteredTransactions) {
+        const listEl = document.getElementById('transactionList');
+        const emptyState = document.getElementById('emptyState');
+        const countEl = document.getElementById('transactionCount');
+        
+        // Clear current list except empty state
+        Array.from(listEl.children).forEach(child => {
+            if (child.id !== 'emptyState') {
+                child.remove();
+            }
+        });
+
+        countEl.innerText = `${filteredTransactions.length} transaksi`;
+
+        if (filteredTransactions.length === 0) {
+            emptyState.classList.remove('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+            
+            // Sort by date (newest first)
+            const sortedTransactions = [...filteredTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedTransactions.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-b-0';
+                
+                const isIncome = t.type === 'income';
+                const amountColor = isIncome ? 'text-success' : 'text-danger';
+                const sign = isIncome ? '+' : '-';
+                
+                // Format date nicely
+                const dateObj = new Date(t.date);
+                const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                tr.innerHTML = `
+                    <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-600">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center ${isIncome ? 'bg-emerald-100 text-success' : 'bg-red-100 text-danger'}">
+                                <i class="fa-solid ${isIncome ? 'fa-arrow-down' : 'fa-arrow-up'} text-xs"></i>
+                            </div>
+                            ${dateStr}
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 text-sm font-medium text-slate-800">${t.description}</td>
+                    <td class="px-5 py-4 whitespace-nowrap text-right text-sm font-bold ${amountColor}">
+                        ${sign} ${formatRupiah(t.amount)}
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
+                        <button onclick="requestDelete('${t.id}')" class="text-slate-400 hover:text-danger transition-colors p-2 rounded-full hover:bg-red-50" title="Hapus">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                listEl.appendChild(tr);
+            });
+        }
+    }
+
+    // --- Application Logic ---
+
+    // Apply the selected filter and update UI
+    function applyFilter() {
+        let filtered = transactions;
+        
+        if (currentFilter === 'week') {
+            filtered = transactions.filter(t => isThisWeek(t.date));
+        } else if (currentFilter === 'month') {
+            filtered = transactions.filter(t => isThisMonth(t.date));
+        }
+
+        updateSummary(filtered);
+        updateTransactionList(filtered);
+        updateFilterButtons();
+    }
+
+    // Set the filter state when a button is clicked
+    function setFilter(filterType) {
+        currentFilter = filterType;
+        applyFilter();
+    }
+
+    // Update the visual state of filter buttons
+    function updateFilterButtons() {
+        const filters = ['all', 'month', 'week'];
+        filters.forEach(f => {
+            const btn = document.getElementById(`btnFilter-${f}`);
+            if (f === currentFilter) {
+                // Active state
+                btn.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors bg-white shadow-sm text-primary";
+            } else {
+                // Inactive state
+                btn.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors text-slate-500 hover:text-slate-700 hover:bg-white/50";
+            }
+        });
+    }
+
+    // Initialize the application on load
+    function init() {
+        // Set current year in footer
+        document.getElementById('currentYear').innerText = new Date().getFullYear();
+        
+        // Set today's date in header
+        const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('currentDateDisplay').innerText = today;
+
+        // Set default date in the form to today
+        document.getElementById('date').valueAsDate = new Date();
+
+        applyFilter();
+    }
+
+    // --- Modal Controls ---
+    const modal = document.getElementById('transactionModal');
+    const modalContent = document.getElementById('modalContent');
+    const form = document.getElementById('transactionForm');
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        // Small delay to allow display:block to apply before animating opacity
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.classList.add('opacity-100');
+            
+            modalContent.classList.remove('translate-y-full', 'sm:translate-y-4');
+            modalContent.classList.add('translate-y-0');
+            
+            // Focus amount input
+            document.getElementById('amount').focus();
+        }, 10);
+    }
+
+    function closeModal() {
+        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0');
+        
+        modalContent.classList.remove('translate-y-0');
+        modalContent.classList.add('translate-y-full', 'sm:translate-y-4');
+        
+        // Wait for transition to finish before hiding
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            form.reset();
+            document.getElementById('date').valueAsDate = new Date(); // reset date to today
+        }, 300);
+    }
+    
+    // --- Custom Confirm Delete Modal Controls ---
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmContent = document.getElementById('confirmContent');
+    
+    function requestDelete(id) {
+        transactionToDeleteId = id;
+        
+        confirmModal.classList.remove('hidden');
+        setTimeout(() => {
+            confirmModal.classList.remove('opacity-0');
+            confirmModal.classList.add('opacity-100');
+            confirmContent.classList.remove('scale-95');
+            confirmContent.classList.add('scale-100');
+        }, 10);
+    }
+    
+    function closeConfirmModal() {
+        transactionToDeleteId = null;
+        confirmModal.classList.remove('opacity-100');
+        confirmModal.classList.add('opacity-0');
+        confirmContent.classList.remove('scale-100');
+        confirmContent.classList.add('scale-95');
+        
+        setTimeout(() => {
+            confirmModal.classList.add('hidden');
+        }, 300);
+    }
+
+    // Execute delete when confirm is clicked
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        if(transactionToDeleteId) {
+            transactions = transactions.filter(t => t.id !== transactionToDeleteId);
+            saveToLocalStorage();
+            applyFilter();
+            closeConfirmModal();
+        }
+    });
+
+    // Close modals when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    
+    confirmModal.addEventListener('click', (e) => {
+        if(e.target === confirmModal) closeConfirmModal();
+    });
+
+    // --- Form Submission Handling ---
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Get values
+        const type = document.querySelector('input[name="type"]:checked').value;
+        const amountStr = document.getElementById('amount').value;
+        const amount = parseRupiah(amountStr);
+        const description = document.getElementById('description').value;
+        const date = document.getElementById('date').value;
+
+        // Validation
+        if (amount <= 0) {
+            alert("Harap masukkan jumlah yang valid (lebih dari 0).");
+            return;
+        }
+
+        // Create transaction object
+        const newTransaction = {
+            id: generateId(),
+            type,
+            amount,
+            description,
+            date
+        };
+
+        // Add to array and save
+        transactions.push(newTransaction);
+        saveToLocalStorage();
+
+        // Update UI
+        applyFilter();
+        
+        // Close modal
+        closeModal();
+    });
+
+    // Run initialization
+    init();
+
+</script>
+</body>
+</html>
