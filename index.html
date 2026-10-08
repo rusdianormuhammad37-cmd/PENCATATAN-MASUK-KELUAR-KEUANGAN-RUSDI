@@ -233,10 +233,10 @@
 <!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // --- KONFIGURASI SUPABASE ---
+    // --- KONFIGURASI SUPABASE (Menggunakan variabel 'db' agar aman & tidak bentrok) ---
     const supabaseUrl = 'https://onssvkrjtoqxzdvjbeob.supabase.co';
     const supabaseKey = 'sb_publishable_YXYOrvgDRHCxKJ1eorzmjg_1dcrPMmi';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     // --- State Management ---
     let transactions = [];
@@ -414,7 +414,7 @@
         document.getElementById('date').valueAsDate = new Date();
 
         try {
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from('transactions')
                 .select('*');
 
@@ -488,7 +488,7 @@
     document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
         if (transactionToDeleteId) {
             try {
-                const { error } = await supabase
+                const { error } = await db
                     .from('transactions')
                     .delete()
                     .eq('id', transactionToDeleteId);
@@ -539,7 +539,7 @@
         };
 
         try {
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from('transactions')
                 .insert([newTransaction])
                 .select();
