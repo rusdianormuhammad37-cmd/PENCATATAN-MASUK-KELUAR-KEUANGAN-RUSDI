@@ -33,7 +33,6 @@
         body {
             background-color: #f1f5f9;
         }
-        /* Custom scrollbar for better look */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -60,7 +59,7 @@
                 <h1 class="text-xl font-bold tracking-tight">Buku Kas Kita</h1>
             </div>
             <div class="text-sm text-slate-500" id="currentDateDisplay">
-                <!-- Date will be injected here -->
+                Memuat tanggal...
             </div>
         </div>
     </header>
@@ -141,7 +140,6 @@
                         </tr>
                     </thead>
                     <tbody id="transactionList" class="divide-y divide-slate-100">
-                        <!-- Transactions will be rendered here dynamically -->
                         <tr id="emptyState" class="hidden">
                             <td colspan="4" class="px-5 py-12 text-center text-slate-400">
                                 <i class="fa-solid fa-receipt text-4xl mb-3 text-slate-300"></i>
@@ -157,16 +155,13 @@
 
     <!-- Footer -->
     <footer class="text-center py-6 text-sm text-slate-400">
-        <p>Buku Kas Kita &copy; <span id="currentYear"></span></p>
+        <p>Buku Kas Kita &copy; <span id="currentYear">2026</span></p>
     </footer>
 </div>
 
 <!-- Modal Overlay for Adding Transaction -->
 <div id="transactionModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex justify-center items-end sm:items-center p-4 transition-opacity opacity-0">
-    
-    <!-- Modal Content -->
     <div class="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-transform translate-y-full sm:translate-y-4" id="modalContent">
-        
         <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
             <h3 class="text-lg font-bold text-slate-800">Tambah Transaksi</h3>
             <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors rounded-full p-1 hover:bg-slate-100">
@@ -175,7 +170,6 @@
         </div>
 
         <form id="transactionForm" class="p-6">
-            <!-- Type Selector (Income/Expense) -->
             <div class="mb-5">
                 <label class="block text-sm font-medium text-slate-700 mb-2">Jenis Transaksi</label>
                 <div class="grid grid-cols-2 gap-3">
@@ -194,30 +188,24 @@
                 </div>
             </div>
 
-            <!-- Amount Input -->
             <div class="mb-4">
                 <label for="amount" class="block text-sm font-medium text-slate-700 mb-1">Jumlah (Rp)</label>
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 font-medium">
-                        Rp
-                    </div>
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 font-medium">Rp</div>
                     <input type="text" id="amount" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-primary focus:border-primary sm:text-lg transition-colors placeholder:text-slate-300" placeholder="0" oninput="formatRupiahInput(this)">
                 </div>
             </div>
 
-            <!-- Description Input -->
             <div class="mb-4">
                 <label for="description" class="block text-sm font-medium text-slate-700 mb-1">Keterangan</label>
                 <input type="text" id="description" required class="block w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-primary focus:border-primary transition-colors" placeholder="Misal: Gaji bulanan, Beli makan...">
             </div>
 
-            <!-- Date Input -->
             <div class="mb-6">
                 <label for="date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal</label>
                 <input type="date" id="date" required class="block w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-primary focus:border-primary transition-colors text-slate-700">
             </div>
 
-            <!-- Submit Button -->
             <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 Simpan Transaksi
             </button>
@@ -233,33 +221,29 @@
                 <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
             </div>
             <h3 class="text-lg font-bold text-slate-800 mb-2">Hapus Transaksi?</h3>
-            <p class="text-sm text-slate-500 mb-6">Tindakan ini tidak dapat dibatalkan. Transaksi akan dihapus secara permanen dari catatan Anda.</p>
+            <p class="text-sm text-slate-500 mb-6">Tindakan ini tidak dapat dibatalkan. Transaksi akan dihapus secara permanen dari database Anda.</p>
             <div class="flex gap-3">
-                <button onclick="closeConfirmModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-lg transition-colors">
-                    Batal
-                </button>
-                <button id="confirmDeleteBtn" class="flex-1 bg-danger hover:bg-red-600 text-white font-medium py-2.5 rounded-lg shadow-sm transition-colors">
-                    Ya, Hapus
-                </button>
+                <button onclick="closeConfirmModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-lg transition-colors">Batal</button>
+                <button id="confirmDeleteBtn" class="flex-1 bg-danger hover:bg-red-600 text-white font-medium py-2.5 rounded-lg shadow-sm transition-colors">Ya, Hapus</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+    // --- KONFIGURASI SUPABASE ---
     const supabaseUrl = 'https://onssvkrjtoqxzdvjbeob.supabase.co';
     const supabaseKey = 'sb_publishable_YXYOrvgDRHCxKJ1eorzmjg_1dcrPMmi';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
     // --- State Management ---
-    // Try to load existing data from LocalStorage, otherwise start empty
     let transactions = [];
-    let currentFilter = 'all'; // 'all', 'month', 'week'
+    let currentFilter = 'all'; 
     let transactionToDeleteId = null;
 
     // --- Helper Functions ---
-
-    // Format number to Indonesian Rupiah currency string
     function formatRupiah(number) {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -269,120 +253,91 @@
         }).format(number);
     }
 
-    // Unformat string back to number
     function parseRupiah(rupiahString) {
         return parseInt(rupiahString.replace(/[^,\d]/g, ''), 10) || 0;
     }
 
-    // Real-time formatting for the amount input field
     function formatRupiahInput(input) {
-        let value = input.value.replace(/[^,\d]/g, ''); // Remove non-digits
+        let value = input.value.replace(/[^,\d]/g, '');
         if (value) {
-            // Format as number with dots
             input.value = new Intl.NumberFormat('id-ID').format(parseInt(value, 10));
         } else {
             input.value = '';
         }
     }
 
-    // Generate a unique ID for new transactions
-    function generateId() {
-        return Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-    }
-
-    // Check if a date falls within the current week
     function isThisWeek(dateString) {
         const today = new Date();
         const date = new Date(dateString);
-        
-        // Reset times to midnight for accurate day comparison
         today.setHours(0, 0, 0, 0);
         date.setHours(0, 0, 0, 0);
 
-        // Get the first day of the current week (Sunday)
         const firstDayOfWeek = new Date(today);
         firstDayOfWeek.setDate(today.getDate() - today.getDay());
-
-        // Get the last day of the current week (Saturday)
         const lastDayOfWeek = new Date(today);
         lastDayOfWeek.setDate(today.getDate() - today.getDay() + 6);
 
         return date >= firstDayOfWeek && date <= lastDayOfWeek;
     }
 
-    // Check if a date falls within the current month
     function isThisMonth(dateString) {
         const today = new Date();
         const date = new Date(dateString);
         return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
     }
 
-    // Save current transactions array to browser LocalStorage
-    function saveToLocalStorage() {
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-    }
-
     // --- UI Updating Functions ---
-
-    // Update the dashboard summary cards based on filtered transactions
     function updateSummary(filteredTransactions) {
         let income = 0;
         let expense = 0;
 
         filteredTransactions.forEach(t => {
             if (t.type === 'income') {
-                income += t.amount;
+                income += Number(t.amount);
             } else {
-                expense += t.amount;
+                expense += Number(t.amount);
             }
         });
 
         const balance = income - expense;
-
-        document.getElementById('totalBalance').innerText = formatRupiah(balance);
-        // Change color based on positive/negative balance
-        if(balance < 0) {
-            document.getElementById('totalBalance').classList.remove('text-slate-800');
-            document.getElementById('totalBalance').classList.add('text-danger');
+        const balanceEl = document.getElementById('totalBalance');
+        balanceEl.innerText = formatRupiah(balance);
+        
+        if (balance < 0) {
+            balanceEl.className = 'text-3xl font-bold text-danger';
         } else {
-            document.getElementById('totalBalance').classList.remove('text-danger');
-            document.getElementById('totalBalance').classList.add('text-slate-800');
+            balanceEl.className = 'text-3xl font-bold text-slate-800';
         }
 
         document.getElementById('totalIncome').innerText = formatRupiah(income);
         document.getElementById('totalExpense').innerText = formatRupiah(expense);
         
-        // Update labels on cards to reflect current filter
         let filterText = 'Semua Waktu';
-        if(currentFilter === 'month') filterText = 'Bulan Ini';
-        if(currentFilter === 'week') filterText = 'Minggu Ini';
+        if (currentFilter === 'month') filterText = 'Bulan Ini';
+        if (currentFilter === 'week') filterText = 'Minggu Ini';
         
         document.querySelectorAll('.filter-label').forEach(el => {
             el.innerText = filterText;
         });
     }
 
-    // Render the table rows based on filtered transactions
     function updateTransactionList(filteredTransactions) {
         const listEl = document.getElementById('transactionList');
         const emptyState = document.getElementById('emptyState');
         const countEl = document.getElementById('transactionCount');
         
-        // Clear current list except empty state
         Array.from(listEl.children).forEach(child => {
             if (child.id !== 'emptyState') {
                 child.remove();
             }
         });
 
-        countEl.innerText = `${filteredTransactions.length} transaksi`;
+        countEl.innerText = `${filteredTransactions.length} item`;
 
         if (filteredTransactions.length === 0) {
             emptyState.classList.remove('hidden');
         } else {
             emptyState.classList.add('hidden');
-            
-            // Sort by date (newest first)
             const sortedTransactions = [...filteredTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedTransactions.forEach(t => {
@@ -393,7 +348,6 @@
                 const amountColor = isIncome ? 'text-success' : 'text-danger';
                 const sign = isIncome ? '+' : '-';
                 
-                // Format date nicely
                 const dateObj = new Date(t.date);
                 const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -403,15 +357,15 @@
                             <div class="w-8 h-8 rounded-full flex items-center justify-center ${isIncome ? 'bg-emerald-100 text-success' : 'bg-red-100 text-danger'}">
                                 <i class="fa-solid ${isIncome ? 'fa-arrow-down' : 'fa-arrow-up'} text-xs"></i>
                             </div>
-                            ${dateStr}
+                            <span class="font-medium">${dateStr}</span>
                         </div>
                     </td>
-                    <td class="px-5 py-4 text-sm font-medium text-slate-800">${t.description}</td>
-                    <td class="px-5 py-4 whitespace-nowrap text-right text-sm font-bold ${amountColor}">
+                    <td class="px-5 py-4 text-sm text-slate-800 font-medium">${t.description}</td>
+                    <td class="px-5 py-4 whitespace-nowrap text-sm text-right font-bold ${amountColor}">
                         ${sign} ${formatRupiah(t.amount)}
                     </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center text-sm font-medium">
-                        <button onclick="requestDelete('${t.id}')" class="text-slate-400 hover:text-danger transition-colors p-2 rounded-full hover:bg-red-50" title="Hapus">
+                    <td class="px-5 py-4 whitespace-nowrap text-center text-sm">
+                        <button onclick="requestDelete('${t.id}')" class="text-slate-400 hover:text-danger transition-colors p-1.5 rounded-lg hover:bg-red-50">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
@@ -421,12 +375,9 @@
         }
     }
 
-    // --- Application Logic ---
-
-    // Apply the selected filter and update UI
+    // --- Application Logic & Filter ---
     function applyFilter() {
         let filtered = transactions;
-        
         if (currentFilter === 'week') {
             filtered = transactions.filter(t => isThisWeek(t.date));
         } else if (currentFilter === 'month') {
@@ -438,59 +389,46 @@
         updateFilterButtons();
     }
 
-    // Set the filter state when a button is clicked
     function setFilter(filterType) {
         currentFilter = filterType;
         applyFilter();
     }
 
-    // Update the visual state of filter buttons
     function updateFilterButtons() {
         const filters = ['all', 'month', 'week'];
         filters.forEach(f => {
             const btn = document.getElementById(`btnFilter-${f}`);
             if (f === currentFilter) {
-                // Active state
                 btn.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors bg-white shadow-sm text-primary";
             } else {
-                // Inactive state
                 btn.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors text-slate-500 hover:text-slate-700 hover:bg-white/50";
             }
         });
     }
 
-    // Initialize the application on load
-async function init() { // Tambahkan async di sini
-    // Set current year in footer
-    document.getElementById('currentYear').innerText = new Date().getFullYear();
+    // --- SUPABASE DATABASE OPERATIONS ---
+    async function init() {
+        document.getElementById('currentYear').innerText = new Date().getFullYear();
+        const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('currentDateDisplay').innerText = today;
+        document.getElementById('date').valueAsDate = new Date();
 
-    // Set today's date in header
-    const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    document.getElementById('currentDateDisplay').innerText = today;
+        try {
+            const { data, error } = await supabase
+                .from('transactions')
+                .select('*');
 
-    // Set default date in the form to today
-    document.getElementById('date').valueAsDate = new Date();
-
-    // --- PROSES MENGAMBIL DATA DARI SUPABASE ---
-    try {
-        const { data, error } = await supabase
-            .from('transactions')
-            .select('*');
-
-        if (error) {
-            console.error("Gagal memuat data:", error);
-        } else if (data) {
-            // Masukkan data dari database ke array aplikasi
-            transactions = data; 
+            if (error) {
+                console.error("Gagal memuat data:", error);
+            } else if (data) {
+                transactions = data;
+            }
+        } catch (err) {
+            console.error("Kesalahan sistem:", err);
         }
-    } catch (err) {
-        console.error("Kesalahan sistem:", err);
-    }
-    // -------------------------------------------
 
-    // Perbarui tampilan UI setelah data selesai didownload
-    applyFilter();
-}
+        applyFilter();
+    }
 
     // --- Modal Controls ---
     const modal = document.getElementById('transactionModal');
@@ -499,15 +437,11 @@ async function init() { // Tambahkan async di sini
 
     function openModal() {
         modal.classList.remove('hidden');
-        // Small delay to allow display:block to apply before animating opacity
         setTimeout(() => {
             modal.classList.remove('opacity-0');
             modal.classList.add('opacity-100');
-            
             modalContent.classList.remove('translate-y-full', 'sm:translate-y-4');
             modalContent.classList.add('translate-y-0');
-            
-            // Focus amount input
             document.getElementById('amount').focus();
         }, 10);
     }
@@ -515,15 +449,12 @@ async function init() { // Tambahkan async di sini
     function closeModal() {
         modal.classList.remove('opacity-100');
         modal.classList.add('opacity-0');
-        
         modalContent.classList.remove('translate-y-0');
         modalContent.classList.add('translate-y-full', 'sm:translate-y-4');
-        
-        // Wait for transition to finish before hiding
         setTimeout(() => {
             modal.classList.add('hidden');
             form.reset();
-            document.getElementById('date').valueAsDate = new Date(); // reset date to today
+            document.getElementById('date').valueAsDate = new Date();
         }, 300);
     }
     
@@ -533,7 +464,6 @@ async function init() { // Tambahkan async di sini
     
     function requestDelete(id) {
         transactionToDeleteId = id;
-        
         confirmModal.classList.remove('hidden');
         setTimeout(() => {
             confirmModal.classList.remove('opacity-0');
@@ -549,80 +479,90 @@ async function init() { // Tambahkan async di sini
         confirmModal.classList.add('opacity-0');
         confirmContent.classList.remove('scale-100');
         confirmContent.classList.add('scale-95');
-        
         setTimeout(() => {
             confirmModal.classList.add('hidden');
         }, 300);
     }
 
-    // Execute delete when confirm is clicked
-    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-        if(transactionToDeleteId) {
-            transactions = transactions.filter(t => t.id !== transactionToDeleteId);
-            saveToLocalStorage();
-            applyFilter();
-            closeConfirmModal();
+    // Execute delete from Supabase when confirmed
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        if (transactionToDeleteId) {
+            try {
+                const { error } = await supabase
+                    .from('transactions')
+                    .delete()
+                    .eq('id', transactionToDeleteId);
+
+                if (error) {
+                    console.error("Gagal menghapus:", error);
+                    alert("Gagal menghapus transaksi dari database.");
+                    return;
+                }
+
+                transactions = transactions.filter(t => t.id !== transactionToDeleteId);
+                applyFilter();
+                closeConfirmModal();
+            } catch (err) {
+                console.error("Kesalahan sistem saat menghapus:", err);
+            }
         }
     });
 
-    // Close modals when clicking outside
     modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
     
     confirmModal.addEventListener('click', (e) => {
-        if(e.target === confirmModal) closeConfirmModal();
+        if (e.target === confirmModal) closeConfirmModal();
     });
 
-    // --- Form Submission Handling ---
+    // --- Form Submission Handling (Insert to Supabase) ---
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Get values
         const type = document.querySelector('input[name="type"]:checked').value;
         const amountStr = document.getElementById('amount').value;
         const amount = parseRupiah(amountStr);
         const description = document.getElementById('description').value;
         const date = document.getElementById('date').value;
 
-        // Validation
         if (amount <= 0) {
             alert("Harap masukkan jumlah yang valid (lebih dari 0).");
             return;
         }
 
-        // Create transaction object
         const newTransaction = {
-            id: generateId(),
             type,
             amount,
             description,
             date
         };
 
-        // Add to array and save
-       const { error } = await supabase
-    .from('transactions')
-    .insert([newTransaction]);
+        try {
+            const { data, error } = await supabase
+                .from('transactions')
+                .insert([newTransaction])
+                .select();
 
-if (error) {
-    console.error(error);
-    alert('Gagal menyimpan transaksi');
-    return;
-}
- 
-transactions.push(newTransaction);
+            if (error) {
+                console.error("Gagal menyimpan:", error);
+                alert('Gagal menyimpan transaksi ke database.');
+                return;
+            }
 
-        // Update UI
-        applyFilter();
-        
-        // Close modal
-        closeModal();
+            if (data && data.length > 0) {
+                transactions.push(data[0]);
+            }
+
+            applyFilter();
+            closeModal();
+        } catch (err) {
+            console.error("Kesalahan sistem saat menyimpan:", err);
+        }
     });
 
-    // Run initialization
+    // Run initialization on load
     init();
-
 </script>
 </body>
 </html>
