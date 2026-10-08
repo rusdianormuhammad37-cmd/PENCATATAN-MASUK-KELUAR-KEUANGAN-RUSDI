@@ -456,19 +456,37 @@
     }
 
     // Initialize the application on load
-    function init() {
-        // Set current year in footer
-        document.getElementById('currentYear').innerText = new Date().getFullYear();
-        
-        // Set today's date in header
-        const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('currentDateDisplay').innerText = today;
+async function init() { // Tambahkan async di sini
+    // Set current year in footer
+    document.getElementById('currentYear').innerText = new Date().getFullYear();
 
-        // Set default date in the form to today
-        document.getElementById('date').valueAsDate = new Date();
+    // Set today's date in header
+    const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('currentDateDisplay').innerText = today;
 
-        applyFilter();
+    // Set default date in the form to today
+    document.getElementById('date').valueAsDate = new Date();
+
+    // --- PROSES MENGAMBIL DATA DARI SUPABASE ---
+    try {
+        const { data, error } = await supabase
+            .from('transactions')
+            .select('*');
+
+        if (error) {
+            console.error("Gagal memuat data:", error);
+        } else if (data) {
+            // Masukkan data dari database ke array aplikasi
+            transactions = data; 
+        }
+    } catch (err) {
+        console.error("Kesalahan sistem:", err);
     }
+    // -------------------------------------------
+
+    // Perbarui tampilan UI setelah data selesai didownload
+    applyFilter();
+}
 
     // --- Modal Controls ---
     const modal = document.getElementById('transactionModal');
@@ -553,7 +571,7 @@
     });
 
     // --- Form Submission Handling ---
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         // Get values
@@ -579,8 +597,17 @@
         };
 
         // Add to array and save
-        transactions.push(newTransaction);
-        saveToLocalStorage();
+       const { error } = await supabase
+    .from('transactions')
+    .insert([newTransaction]);
+
+if (error) {
+    console.error(error);
+    alert('Gagal menyimpan transaksi');
+    return;
+}
+ 
+transactions.push(newTransaction);
 
         // Update UI
         applyFilter();
