@@ -11,6 +11,9 @@
     <!-- Import Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Memanggil file CSS Anda -->
+    <link rel="stylesheet" href="style.css">
+
     <script>
         tailwind.config = {
             theme: {
@@ -29,44 +32,73 @@
             }
         }
     </script>
-    <style>
-        body {
-            background-color: #f1f5f9;
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
-    </style>
 </head>
 <body class="text-slate-700 font-sans antialiased">
 
-<div class="min-h-screen flex flex-col">
+<!-- ==================== HALAMAN LOGIN ==================== -->
+<div id="authContainer" class="min-h-screen flex items-center justify-center p-4 bg-slate-100">
+    <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-wallet text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800">DUIT ALA RUSDI</h2>
+            <p class="text-sm text-slate-500 mt-1">Silakan masuk untuk mencatat keuangan Anda</p>
+        </div>
+
+        <form id="authForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <input type="email" id="authEmail" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-primary focus:border-primary transition-colors" placeholder="email@anda.com">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <input type="password" id="authPassword" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-primary focus:border-primary transition-colors" placeholder="Minimal 6 karakter">
+                </div>
+            </div>
+            
+            <div class="pt-2 space-y-3">
+                <button type="button" onclick="handleAuth('login')" class="w-full bg-primary hover:bg-blue-600 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition-colors">
+                    Masuk
+                </button>
+                <button type="button" onclick="handleAuth('register')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 px-4 rounded-lg transition-colors">
+                    Daftar Akun Baru
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== APLIKASI UTAMA (Tersembunyi Sebelum Login) ==================== -->
+<div id="mainApp" class="hidden min-h-screen flex-col">
     <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-10">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center gap-2 text-primary">
                 <i class="fa-solid fa-wallet text-2xl"></i>
-                <h1 class="text-xl font-bold tracking-tight">DUIT ALA RUSDI</h1>
+                <h1 class="text-xl font-bold tracking-tight">Buku Kas Kita</h1>
             </div>
-            <div class="text-sm text-slate-500" id="currentDateDisplay">
-                Memuat tanggal...
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:block text-sm text-slate-500" id="currentDateDisplay">Memuat tanggal...</div>
+                <!-- Tombol Logout Baru -->
+                <button onclick="handleLogout()" class="text-sm font-medium text-danger hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">Keluar</span>
+                </button>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 flex flex-col gap-6">
-        
         <!-- Summary Cards -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Total Balance -->
@@ -159,6 +191,7 @@
     </footer>
 </div>
 
+<!-- ==================== MODAL TAMBAH & HAPUS ==================== -->
 <!-- Modal Overlay for Adding Transaction -->
 <div id="transactionModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex justify-center items-end sm:items-center p-4 transition-opacity opacity-0">
     <div class="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-transform translate-y-full sm:translate-y-4" id="modalContent">
@@ -232,337 +265,8 @@
 
 <!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    // --- KONFIGURASI SUPABASE (Menggunakan variabel 'db' agar aman & tidak bentrok) ---
-    const supabaseUrl = 'https://onssvkrjtoqxzdvjbeob.supabase.co';
-    const supabaseKey = 'sb_publishable_YXYOrvgDRHCxKJ1eorzmjg_1dcrPMmi';
-    const db = window.supabase.createClient(supabaseUrl, supabaseKey);
+<!-- Memanggil file JavaScript Utama -->
+<script src="script.js"></script>
 
-    // --- State Management ---
-    let transactions = [];
-    let currentFilter = 'all'; 
-    let transactionToDeleteId = null;
-
-    // --- Helper Functions ---
-    function formatRupiah(number) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(number);
-    }
-
-    function parseRupiah(rupiahString) {
-        return parseInt(rupiahString.replace(/[^,\d]/g, ''), 10) || 0;
-    }
-
-    function formatRupiahInput(input) {
-        let value = input.value.replace(/[^,\d]/g, '');
-        if (value) {
-            input.value = new Intl.NumberFormat('id-ID').format(parseInt(value, 10));
-        } else {
-            input.value = '';
-        }
-    }
-
-    function isThisWeek(dateString) {
-        const today = new Date();
-        const date = new Date(dateString);
-        today.setHours(0, 0, 0, 0);
-        date.setHours(0, 0, 0, 0);
-
-        const firstDayOfWeek = new Date(today);
-        firstDayOfWeek.setDate(today.getDate() - today.getDay());
-        const lastDayOfWeek = new Date(today);
-        lastDayOfWeek.setDate(today.getDate() - today.getDay() + 6);
-
-        return date >= firstDayOfWeek && date <= lastDayOfWeek;
-    }
-
-    function isThisMonth(dateString) {
-        const today = new Date();
-        const date = new Date(dateString);
-        return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-    }
-
-    // --- UI Updating Functions ---
-    function updateSummary(filteredTransactions) {
-        let income = 0;
-        let expense = 0;
-
-        filteredTransactions.forEach(t => {
-            if (t.type === 'income') {
-                income += Number(t.amount);
-            } else {
-                expense += Number(t.amount);
-            }
-        });
-
-        const balance = income - expense;
-        const balanceEl = document.getElementById('totalBalance');
-        balanceEl.innerText = formatRupiah(balance);
-        
-        if (balance < 0) {
-            balanceEl.className = 'text-3xl font-bold text-danger';
-        } else {
-            balanceEl.className = 'text-3xl font-bold text-slate-800';
-        }
-
-        document.getElementById('totalIncome').innerText = formatRupiah(income);
-        document.getElementById('totalExpense').innerText = formatRupiah(expense);
-        
-        let filterText = 'Semua Waktu';
-        if (currentFilter === 'month') filterText = 'Bulan Ini';
-        if (currentFilter === 'week') filterText = 'Minggu Ini';
-        
-        document.querySelectorAll('.filter-label').forEach(el => {
-            el.innerText = filterText;
-        });
-    }
-
-    function updateTransactionList(filteredTransactions) {
-        const listEl = document.getElementById('transactionList');
-        const emptyState = document.getElementById('emptyState');
-        const countEl = document.getElementById('transactionCount');
-        
-        Array.from(listEl.children).forEach(child => {
-            if (child.id !== 'emptyState') {
-                child.remove();
-            }
-        });
-
-        countEl.innerText = `${filteredTransactions.length} item`;
-
-        if (filteredTransactions.length === 0) {
-            emptyState.classList.remove('hidden');
-        } else {
-            emptyState.classList.add('hidden');
-            const sortedTransactions = [...filteredTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            sortedTransactions.forEach(t => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-b-0';
-                
-                const isIncome = t.type === 'income';
-                const amountColor = isIncome ? 'text-success' : 'text-danger';
-                const sign = isIncome ? '+' : '-';
-                
-                const dateObj = new Date(t.date);
-                const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-
-                tr.innerHTML = `
-                    <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-600">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center ${isIncome ? 'bg-emerald-100 text-success' : 'bg-red-100 text-danger'}">
-                                <i class="fa-solid ${isIncome ? 'fa-arrow-down' : 'fa-arrow-up'} text-xs"></i>
-                            </div>
-                            <span class="font-medium">${dateStr}</span>
-                        </div>
-                    </td>
-                    <td class="px-5 py-4 text-sm text-slate-800 font-medium">${t.description}</td>
-                    <td class="px-5 py-4 whitespace-nowrap text-sm text-right font-bold ${amountColor}">
-                        ${sign} ${formatRupiah(t.amount)}
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center text-sm">
-                        <button onclick="requestDelete('${t.id}')" class="text-slate-400 hover:text-danger transition-colors p-1.5 rounded-lg hover:bg-red-50">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </td>
-                `;
-                listEl.appendChild(tr);
-            });
-        }
-    }
-
-    // --- Application Logic & Filter ---
-    function applyFilter() {
-        let filtered = transactions;
-        if (currentFilter === 'week') {
-            filtered = transactions.filter(t => isThisWeek(t.date));
-        } else if (currentFilter === 'month') {
-            filtered = transactions.filter(t => isThisMonth(t.date));
-        }
-
-        updateSummary(filtered);
-        updateTransactionList(filtered);
-        updateFilterButtons();
-    }
-
-    function setFilter(filterType) {
-        currentFilter = filterType;
-        applyFilter();
-    }
-
-    function updateFilterButtons() {
-        const filters = ['all', 'month', 'week'];
-        filters.forEach(f => {
-            const btn = document.getElementById(`btnFilter-${f}`);
-            if (f === currentFilter) {
-                btn.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors bg-white shadow-sm text-primary";
-            } else {
-                btn.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors text-slate-500 hover:text-slate-700 hover:bg-white/50";
-            }
-        });
-    }
-
-    // --- SUPABASE DATABASE OPERATIONS ---
-    async function init() {
-        document.getElementById('currentYear').innerText = new Date().getFullYear();
-        const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('currentDateDisplay').innerText = today;
-        document.getElementById('date').valueAsDate = new Date();
-
-        try {
-            const { data, error } = await db
-                .from('transactions')
-                .select('*');
-
-            if (error) {
-                console.error("Gagal memuat data:", error);
-            } else if (data) {
-                transactions = data;
-            }
-        } catch (err) {
-            console.error("Kesalahan sistem:", err);
-        }
-
-        applyFilter();
-    }
-
-    // --- Modal Controls ---
-    const modal = document.getElementById('transactionModal');
-    const modalContent = document.getElementById('modalContent');
-    const form = document.getElementById('transactionForm');
-
-    function openModal() {
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            modal.classList.add('opacity-100');
-            modalContent.classList.remove('translate-y-full', 'sm:translate-y-4');
-            modalContent.classList.add('translate-y-0');
-            document.getElementById('amount').focus();
-        }, 10);
-    }
-
-    function closeModal() {
-        modal.classList.remove('opacity-100');
-        modal.classList.add('opacity-0');
-        modalContent.classList.remove('translate-y-0');
-        modalContent.classList.add('translate-y-full', 'sm:translate-y-4');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            form.reset();
-            document.getElementById('date').valueAsDate = new Date();
-        }, 300);
-    }
-    
-    // --- Custom Confirm Delete Modal Controls ---
-    const confirmModal = document.getElementById('confirmModal');
-    const confirmContent = document.getElementById('confirmContent');
-    
-    function requestDelete(id) {
-        transactionToDeleteId = id;
-        confirmModal.classList.remove('hidden');
-        setTimeout(() => {
-            confirmModal.classList.remove('opacity-0');
-            confirmModal.classList.add('opacity-100');
-            confirmContent.classList.remove('scale-95');
-            confirmContent.classList.add('scale-100');
-        }, 10);
-    }
-    
-    function closeConfirmModal() {
-        transactionToDeleteId = null;
-        confirmModal.classList.remove('opacity-100');
-        confirmModal.classList.add('opacity-0');
-        confirmContent.classList.remove('scale-100');
-        confirmContent.classList.add('scale-95');
-        setTimeout(() => {
-            confirmModal.classList.add('hidden');
-        }, 300);
-    }
-
-    // Execute delete from Supabase when confirmed
-    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
-        if (transactionToDeleteId) {
-            try {
-                const { error } = await db
-                    .from('transactions')
-                    .delete()
-                    .eq('id', transactionToDeleteId);
-
-                if (error) {
-                    console.error("Gagal menghapus:", error);
-                    alert("Gagal menghapus transaksi dari database.");
-                    return;
-                }
-
-                transactions = transactions.filter(t => t.id !== transactionToDeleteId);
-                applyFilter();
-                closeConfirmModal();
-            } catch (err) {
-                console.error("Kesalahan sistem saat menghapus:", err);
-            }
-        }
-    });
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-    });
-    
-    confirmModal.addEventListener('click', (e) => {
-        if (e.target === confirmModal) closeConfirmModal();
-    });
-
-    // --- Form Submission Handling (Insert to Supabase) ---
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const type = document.querySelector('input[name="type"]:checked').value;
-        const amountStr = document.getElementById('amount').value;
-        const amount = parseRupiah(amountStr);
-        const description = document.getElementById('description').value;
-        const date = document.getElementById('date').value;
-
-        if (amount <= 0) {
-            alert("Harap masukkan jumlah yang valid (lebih dari 0).");
-            return;
-        }
-
-        const newTransaction = {
-            type,
-            amount,
-            description,
-            date
-        };
-
-        try {
-            const { data, error } = await db
-                .from('transactions')
-                .insert([newTransaction])
-                .select();
-
-            if (error) {
-                console.error("Gagal menyimpan:", error);
-                alert('Gagal menyimpan transaksi ke database.');
-                return;
-            }
-
-            if (data && data.length > 0) {
-                transactions.push(data[0]);
-            }
-
-            applyFilter();
-            closeModal();
-        } catch (err) {
-            console.error("Kesalahan sistem saat menyimpan:", err);
-        }
-    });
-
-    // Run initialization on load
-    init();
-</script>
 </body>
 </html>
