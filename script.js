@@ -3,398 +3,357 @@ const supabaseUrl = 'https://onssvkrjtoqxzdvjbeob.supabase.co';
 const supabaseKey = 'sb_publishable_YXYOrvgDRHCxKJ1eorzmjg_1dcrPMmi';
 const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// --- State Management ---
 let transactions = [];
 let currentFilter = 'all'; 
 let transactionToDeleteId = null;
-let currentUser = null; // Menyimpan data user yang sedang login
+let currentUser = null;
+let editingTransactionId = null; // Menandakan sedang mode edit
 
-// --- AUTHENTICATION (SISTEM LOGIN) ---
-// Mengecek apakah ada yang sudah login otomatis (sesi aktif)
+// --- AUTHENTICATION ---
 db.auth.onAuthStateChange((event, session) => {
     if (session) {
-        // Jika ada yang login, sembunyikan form login, tampilkan aplikasi utama
         currentUser = session.user;
         document.getElementById('authContainer').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         document.getElementById('mainApp').classList.add('flex');
-        init(); // Panggil data transaksi milik user ini
+        init();
     } else {
-        // Jika tidak ada yang login (atau logout)
         currentUser = null;
         document.getElementById('authContainer').classList.remove('hidden');
         document.getElementById('mainApp').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('flex');
-        
-        // Kosongkan data agar aman
         transactions = [];
-        updateTransactionList([]);
-        updateSummary([]);
     }
 });
 
-// Fungsi untuk Daftar & Masuk
 async function handleAuth(actionType) {
     const email = document.getElementById('authEmail').value;
     const password = document.getElementById('authPassword').value;
+    if (!email || !password) return alert("Harap isi email dan password!");
+    if (actionType === 'login') await db.auth.signInWithPassword({ email, password });
+    else if (actionType === 'register') await db.auth.signUp({ email, password });
+}
 
-    if (!email || !password) {
-        alert("Harap isi email dan password!");
+async function handleLogout() { await db.auth.signOut(); }
+
+// --- NAVIGASI HALAMAN (TABS) ---
+function switchPage(page) {
+    const pageHome = document.getElementById('page-home');
+    const pageCategory = document.getElementById('page-category');
+    const navHome = document.getElementById('nav-home');
+    const navCategory = document.getElementById('nav-category');
+
+    if (page === 'home') {
+        pageHome.classList.remove('hidden');
+        pageHome.classList.add('flex');
+        pageCategory.classList.add('hidden');
+        pageCategory.classList.remove('flex');
+        
+        navHome.className = "py-3 px-1 border-b-2 border-primary text-primary font-medium text-sm transition-colors";
+        navCategory.className = "py-3 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium text-sm transition-colors";
+    } else if (page === 'category') {
+        pageCategory.classList.remove('hidden');
+        pageCategory.classList.add('flex');
+        pageHome.classList.add('hidden');
+        pageHome.classList.remove('flex');
+        
+        navCategory.className = "py-3 px-1 border-b-2 border-primary text-primary font-medium text-sm transition-colors";
+        navHome.className = "py-3 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium text-sm transition-colors";
+    }
+}
+
+// --- FUNGSI HELPER ---
+function formatRupiah(number) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number); }
+function parseRupiah(str) { return parseInt(str.replace(/[^,\d]/g, ''), 10) || 0; }
+function formatRupiahInput(input) {
+    let val = input.value.replace(/[^,\d]/g, '');
+    if (val) input.value = new Intl.NumberFormat('id-ID').format(parseInt(val, 10));
+    else input.value = '';
+}
+function isThisMonth(dateString) {
+    const today = new Date(); const d = new Date(dateString);
+    return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+}
+
+// --- UPDATE TAMPILAN BERANDA ---
+function updateSummary(filtered) {
+    let inc = 0; let exp = 0;
+    filtered.forEach(t => { if (t.type === 'income') inc += Number(t.amount); else exp += Number(t.amount); });
+    
+    const balanceEl = document.getElementById('totalBalance');
+    const incomeEl = document.getElementById('totalIncome');
+    const expEl = document.getElementById('totalExpense');
+    
+    if (balanceEl) balanceEl.innerText = formatRupiah(inc - exp);
+    if (incomeEl) incomeEl.innerText = formatRupiah(inc);
+    if (expEl) expEl.innerText = formatRupiah(exp);
+}
+
+function updateTransactionList(filtered) {
+    const listEl = document.getElementById('transactionList');
+    const countEl = document.getElementById('transactionCount');
+    
+    if (!listEl) return; // Pengaman agar tidak error
+
+    if (countEl) countEl.innerText = `${filtered.length} item`;
+    listEl.innerHTML = ''; 
+
+    if (filtered.length === 0) {
+        listEl.innerHTML = `<tr><td colspan="5" class="px-5 py-8 text-center text-slate-400">Belum ada transaksi.</td></tr>`;
         return;
     }
 
-    if (actionType === 'login') {
-        const { error } = await db.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert("Login gagal: " + error.message);
-        }
-    } else if (actionType === 'register') {
-        const { error } = await db.auth.signUp({ email, password });
-        if (error) {
-            alert("Pendaftaran gagal: " + error.message);
-        } else {
-            alert("Berhasil mendaftar! Anda akan langsung masuk ke aplikasi.");
-            // Kosongkan form
-            document.getElementById('authEmail').value = '';
-            document.getElementById('authPassword').value = '';
-        }
-    }
+    const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+    sorted.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-50';
+        const isInc = t.type === 'income';
+        const catText = t.category || 'Lainnya';
+        
+        tr.innerHTML = `
+            <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-600">${new Date(t.date).toLocaleDateString('id-ID')}</td>
+            <td class="px-5 py-4 text-sm font-medium text-slate-800">${t.description}</td>
+            <td class="px-5 py-4"><span class="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs rounded-lg border border-slate-200">${catText}</span></td>
+            <td class="px-5 py-4 text-sm text-right font-bold ${isInc ? 'text-success' : 'text-danger'}">${isInc ? '+' : '-'} ${formatRupiah(t.amount)}</td>
+            <td class="px-5 py-4 text-center whitespace-nowrap">
+                <button onclick="editTx('${t.id}')" class="text-slate-400 hover:text-primary transition-colors p-1.5 rounded-lg hover:bg-blue-50 mr-1" title="Edit">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button onclick="deleteTx('${t.id}')" class="text-slate-400 hover:text-danger transition-colors p-1.5 rounded-lg hover:bg-red-50" title="Hapus">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </td>
+        `;
+        listEl.appendChild(tr);
+    });
 }
 
-// Fungsi Logout
-async function handleLogout() {
-    const { error } = await db.auth.signOut();
-    if (error) {
-        alert("Gagal keluar: " + error.message);
-    }
-}
+// --- UPDATE TAMPILAN KATEGORI ---
+function updateCategoryPage(filtered) {
+    const incList = document.getElementById('incomeCategoryList');
+    const expList = document.getElementById('expenseCategoryList');
+    
+    if (!incList || !expList) return; // Pengaman agar tidak error
 
+    incList.innerHTML = ''; 
+    expList.innerHTML = '';
 
-// --- Helper Functions Format Angka ---
-function formatRupiah(number) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    }).format(number);
-}
+    const catTotals = { income: {}, expense: {} };
+    let totalInc = 0; let totalExp = 0;
 
-function parseRupiah(rupiahString) {
-    return parseInt(rupiahString.replace(/[^,\d]/g, ''), 10) || 0;
-}
-
-function formatRupiahInput(input) {
-    let value = input.value.replace(/[^,\d]/g, '');
-    if (value) {
-        input.value = new Intl.NumberFormat('id-ID').format(parseInt(value, 10));
-    } else {
-        input.value = '';
-    }
-}
-
-// Filter Tanggal
-function isThisWeek(dateString) {
-    const today = new Date();
-    const date = new Date(dateString);
-    today.setHours(0, 0, 0, 0);
-    date.setHours(0, 0, 0, 0);
-
-    const firstDayOfWeek = new Date(today);
-    firstDayOfWeek.setDate(today.getDate() - today.getDay());
-    const lastDayOfWeek = new Date(today);
-    lastDayOfWeek.setDate(today.getDate() - today.getDay() + 6);
-
-    return date >= firstDayOfWeek && date <= lastDayOfWeek;
-}
-
-function isThisMonth(dateString) {
-    const today = new Date();
-    const date = new Date(dateString);
-    return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-}
-
-// --- UI Updating Functions ---
-function updateSummary(filteredTransactions) {
-    let income = 0;
-    let expense = 0;
-
-    filteredTransactions.forEach(t => {
+    filtered.forEach(t => {
+        const cat = t.category || 'Lainnya';
         if (t.type === 'income') {
-            income += Number(t.amount);
+            catTotals.income[cat] = (catTotals.income[cat] || 0) + Number(t.amount);
+            totalInc += Number(t.amount);
         } else {
-            expense += Number(t.amount);
+            catTotals.expense[cat] = (catTotals.expense[cat] || 0) + Number(t.amount);
+            totalExp += Number(t.amount);
         }
     });
 
-    const balance = income - expense;
-    const balanceEl = document.getElementById('totalBalance');
-    balanceEl.innerText = formatRupiah(balance);
-    
-    if (balance < 0) {
-        balanceEl.className = 'text-3xl font-bold text-danger';
+    if (Object.keys(catTotals.expense).length === 0) {
+        expList.innerHTML = `<p class="text-sm text-slate-400 text-center py-4">Belum ada data pengeluaran</p>`;
     } else {
-        balanceEl.className = 'text-3xl font-bold text-slate-800';
-    }
-
-    document.getElementById('totalIncome').innerText = formatRupiah(income);
-    document.getElementById('totalExpense').innerText = formatRupiah(expense);
-    
-    let filterText = 'Semua Waktu';
-    if (currentFilter === 'month') filterText = 'Bulan Ini';
-    if (currentFilter === 'week') filterText = 'Minggu Ini';
-    
-    document.querySelectorAll('.filter-label').forEach(el => {
-        el.innerText = filterText;
-    });
-}
-
-function updateTransactionList(filteredTransactions) {
-    const listEl = document.getElementById('transactionList');
-    const emptyState = document.getElementById('emptyState');
-    const countEl = document.getElementById('transactionCount');
-    
-    Array.from(listEl.children).forEach(child => {
-        if (child.id !== 'emptyState') {
-            child.remove();
-        }
-    });
-
-    countEl.innerText = `${filteredTransactions.length} item`;
-
-    if (filteredTransactions.length === 0) {
-        emptyState.classList.remove('hidden');
-    } else {
-        emptyState.classList.add('hidden');
-        const sortedTransactions = [...filteredTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        sortedTransactions.forEach(t => {
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-b-0';
-            
-            const isIncome = t.type === 'income';
-            const amountColor = isIncome ? 'text-success' : 'text-danger';
-            const sign = isIncome ? '+' : '-';
-            
-            const dateObj = new Date(t.date);
-            const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-
-            tr.innerHTML = `
-                <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-600">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center ${isIncome ? 'bg-emerald-100 text-success' : 'bg-red-100 text-danger'}">
-                            <i class="fa-solid ${isIncome ? 'fa-arrow-down' : 'fa-arrow-up'} text-xs"></i>
-                        </div>
-                        <span class="font-medium">${dateStr}</span>
+        for (const [cat, amt] of Object.entries(catTotals.expense).sort((a, b) => b[1] - a[1])) {
+            const percent = ((amt / totalExp) * 100).toFixed(1);
+            expList.innerHTML += `
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="font-medium text-slate-700">${cat}</span>
+                        <span class="text-slate-600 font-medium">${formatRupiah(amt)} <span class="text-slate-400 text-xs font-normal">(${percent}%)</span></span>
                     </div>
-                </td>
-                <td class="px-5 py-4 text-sm text-slate-800 font-medium">${t.description}</td>
-                <td class="px-5 py-4 whitespace-nowrap text-sm text-right font-bold ${amountColor}">
-                    ${sign} ${formatRupiah(t.amount)}
-                </td>
-                <td class="px-5 py-4 whitespace-nowrap text-center text-sm">
-                    <button onclick="requestDelete('${t.id}')" class="text-slate-400 hover:text-danger transition-colors p-1.5 rounded-lg hover:bg-red-50">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </td>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                        <div class="bg-danger h-2 rounded-full" style="width: ${percent}%"></div>
+                    </div>
+                </div>
             `;
-            listEl.appendChild(tr);
-        });
+        }
+    }
+
+    if (Object.keys(catTotals.income).length === 0) {
+        incList.innerHTML = `<p class="text-sm text-slate-400 text-center py-4">Belum ada data pemasukan</p>`;
+    } else {
+        for (const [cat, amt] of Object.entries(catTotals.income).sort((a, b) => b[1] - a[1])) {
+            const percent = ((amt / totalInc) * 100).toFixed(1);
+            incList.innerHTML += `
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="font-medium text-slate-700">${cat}</span>
+                        <span class="text-slate-600 font-medium">${formatRupiah(amt)} <span class="text-slate-400 text-xs font-normal">(${percent}%)</span></span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                        <div class="bg-success h-2 rounded-full" style="width: ${percent}%"></div>
+                    </div>
+                </div>
+            `;
+        }
     }
 }
 
-// --- Application Logic & Filter ---
+// --- FILTER & INIT ---
 function applyFilter() {
     let filtered = transactions;
-    if (currentFilter === 'week') {
-        filtered = transactions.filter(t => isThisWeek(t.date));
-    } else if (currentFilter === 'month') {
-        filtered = transactions.filter(t => isThisMonth(t.date));
-    }
+    if (currentFilter === 'month') filtered = transactions.filter(t => isThisMonth(t.date));
 
     updateSummary(filtered);
     updateTransactionList(filtered);
-    updateFilterButtons();
+    updateCategoryPage(filtered); 
+
+    const btnAll = document.getElementById('btnFilter-all');
+    const btnMonth = document.getElementById('btnFilter-month');
+    
+    if (btnAll) btnAll.className = currentFilter === 'all' ? "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors bg-white shadow-sm text-primary" : "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors text-slate-500 hover:text-slate-700 hover:bg-white/50";
+    if (btnMonth) btnMonth.className = currentFilter === 'month' ? "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors bg-white shadow-sm text-primary" : "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors text-slate-500 hover:text-slate-700 hover:bg-white/50";
 }
 
-function setFilter(filterType) {
-    currentFilter = filterType;
+function setFilter(type) { currentFilter = type; applyFilter(); }
+
+async function init() {
+    if (!currentUser) return;
+    
+    const dateInput = document.getElementById('date');
+    if (dateInput) dateInput.valueAsDate = new Date();
+    
+    updateCategoryOptions(); 
+    try {
+        const { data, error } = await db.from('transactions').select('*').eq('user_id', currentUser.id);
+        if (data) transactions = data;
+    } catch (err) {}
     applyFilter();
 }
 
-function updateFilterButtons() {
-    const filters = ['all', 'month', 'week'];
-    filters.forEach(f => {
-        const btn = document.getElementById(`btnFilter-${f}`);
-        if (f === currentFilter) {
-            btn.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors bg-white shadow-sm text-primary";
+// --- MODAL & FORM (EDIT / TAMBAH) ---
+function updateCategoryOptions() {
+    const typeEl = document.querySelector('input[name="type"]:checked');
+    if (!typeEl) return;
+    
+    const type = typeEl.value;
+    const catSelect = document.getElementById('category');
+    if (!catSelect) return;
+    
+    catSelect.innerHTML = ''; 
+
+    const incomeCategories = ['Pemasukan', 'Saldo', 'Lainnya'];
+    const expenseCategories = ['Makanan', 'Transportasi', 'Belanja', 'Sembako', 'Pengeluaran', 'Pemasukan','Saldo', 'Minuman', 'Hiburan', 'Lainnya'];
+
+    const options = type === 'income' ? incomeCategories : expenseCategories;
+    options.forEach(cat => {
+        catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+    });
+}
+
+function openModal() {
+    const modal = document.getElementById('transactionModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    setTimeout(() => { modal.classList.add('opacity-100'); }, 10);
+}
+
+function closeModal() {
+    const modal = document.getElementById('transactionModal');
+    if (!modal) return;
+    modal.classList.remove('opacity-100');
+    setTimeout(() => { 
+        modal.classList.add('hidden'); 
+        
+        const form = document.getElementById('transactionForm');
+        if (form) form.reset();
+        
+        const dateInput = document.getElementById('date');
+        if (dateInput) dateInput.valueAsDate = new Date();
+        
+        // Reset status edit
+        editingTransactionId = null;
+        const title = document.querySelector('#modalContent h3');
+        if (title) title.innerText = 'Tambah Transaksi';
+    }, 300);
+}
+
+// Fungsi Buka Form dalam Mode Edit
+function editTx(id) {
+    const t = transactions.find(x => x.id === id);
+    if (!t) return;
+    
+    editingTransactionId = id; 
+    
+    const title = document.querySelector('#modalContent h3');
+    if (title) title.innerText = 'Edit Transaksi';
+    
+    const typeRadio = document.querySelector(`input[name="type"][value="${t.type}"]`);
+    if (typeRadio) typeRadio.checked = true;
+    
+    updateCategoryOptions(); 
+    
+    const catSelect = document.getElementById('category');
+    if (catSelect) {
+        if (Array.from(catSelect.options).some(opt => opt.value === t.category)) {
+            catSelect.value = t.category;
         } else {
-            btn.className = "flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md transition-colors text-slate-500 hover:text-slate-700 hover:bg-white/50";
+            catSelect.value = 'Lainnya';
+        }
+    }
+    
+    const amountInput = document.getElementById('amount');
+    if (amountInput) amountInput.value = new Intl.NumberFormat('id-ID').format(t.amount);
+    
+    const descInput = document.getElementById('description');
+    if (descInput) descInput.value = t.description;
+    
+    const dateInput = document.getElementById('date');
+    if (dateInput) dateInput.value = t.date;
+    
+    openModal();
+}
+
+// Fungsi Simpan (Menangani Insert Baru dan Update Edit)
+const txForm = document.getElementById('transactionForm');
+if (txForm) {
+    txForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser) return alert("Anda harus login.");
+
+        const type = document.querySelector('input[name="type"]:checked').value;
+        const category = document.getElementById('category').value;
+        const amount = parseRupiah(document.getElementById('amount').value);
+        const description = document.getElementById('description').value;
+        const date = document.getElementById('date').value;
+
+        if (amount <= 0) return alert("Jumlah tidak valid.");
+
+        const txData = { type, category, amount, description, date, user_id: currentUser.id };
+
+        try {
+            if (editingTransactionId) {
+                // Mode Edit
+                const { data, error } = await db.from('transactions').update(txData).eq('id', editingTransactionId).select();
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    const index = transactions.findIndex(t => t.id === editingTransactionId);
+                    if (index !== -1) transactions[index] = data[0]; 
+                }
+            } else {
+                // Mode Tambah Baru
+                const { data, error } = await db.from('transactions').insert([txData]).select();
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    transactions.push(data[0]);
+                }
+            }
+            
+            applyFilter(); 
+            closeModal();
+        } catch (err) { 
+            console.error("Error saat menyimpan:", err); 
+            alert("Gagal menyimpan: " + (err.message || "Silakan cek koneksi atau database."));
         }
     });
 }
 
-// --- SUPABASE DATABASE OPERATIONS ---
-async function init() {
-    if (!currentUser) return; // Jangan ambil data jika belum login
-
-    document.getElementById('currentYear').innerText = new Date().getFullYear();
-    const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    document.getElementById('currentDateDisplay').innerText = today;
-    document.getElementById('date').valueAsDate = new Date();
-
-    try {
-        // Hanya ambil data transaksi di mana user_id sesuai dengan id pengguna yang login
-        const { data, error } = await db
-            .from('transactions')
-            .select('*')
-            .eq('user_id', currentUser.id);
-
-        if (error) {
-            console.error("Gagal memuat data:", error);
-        } else if (data) {
-            transactions = data;
-        }
-    } catch (err) {
-        console.error("Kesalahan sistem:", err);
-    }
-
-    applyFilter();
-}
-
-// --- Modal Controls ---
-const modal = document.getElementById('transactionModal');
-const modalContent = document.getElementById('modalContent');
-const form = document.getElementById('transactionForm');
-
-function openModal() {
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        modal.classList.add('opacity-100');
-        modalContent.classList.remove('translate-y-full', 'sm:translate-y-4');
-        modalContent.classList.add('translate-y-0');
-        document.getElementById('amount').focus();
-    }, 10);
-}
-
-function closeModal() {
-    modal.classList.remove('opacity-100');
-    modal.classList.add('opacity-0');
-    modalContent.classList.remove('translate-y-0');
-    modalContent.classList.add('translate-y-full', 'sm:translate-y-4');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-        form.reset();
-        document.getElementById('date').valueAsDate = new Date();
-    }, 300);
-}
-
-const confirmModal = document.getElementById('confirmModal');
-const confirmContent = document.getElementById('confirmContent');
-
-function requestDelete(id) {
-    transactionToDeleteId = id;
-    confirmModal.classList.remove('hidden');
-    setTimeout(() => {
-        confirmModal.classList.remove('opacity-0');
-        confirmModal.classList.add('opacity-100');
-        confirmContent.classList.remove('scale-95');
-        confirmContent.classList.add('scale-100');
-    }, 10);
-}
-
-function closeConfirmModal() {
-    transactionToDeleteId = null;
-    confirmModal.classList.remove('opacity-100');
-    confirmModal.classList.add('opacity-0');
-    confirmContent.classList.remove('scale-100');
-    confirmContent.classList.add('scale-95');
-    setTimeout(() => {
-        confirmModal.classList.add('hidden');
-    }, 300);
-}
-
-// Hapus Data
-document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
-    if (transactionToDeleteId) {
-        try {
-            const { error } = await db
-                .from('transactions')
-                .delete()
-                .eq('id', transactionToDeleteId)
-                .eq('user_id', currentUser.id); // Tambahan keamanan
-
-            if (error) {
-                console.error("Gagal menghapus:", error);
-                alert("Gagal menghapus transaksi dari database.");
-                return;
-            }
-
-            transactions = transactions.filter(t => t.id !== transactionToDeleteId);
-            applyFilter();
-            closeConfirmModal();
-        } catch (err) {
-            console.error("Kesalahan sistem saat menghapus:", err);
-        }
-    }
-});
-
-modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-});
-
-confirmModal.addEventListener('click', (e) => {
-    if (e.target === confirmModal) closeConfirmModal();
-});
-
-// Simpan Data
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    if (!currentUser) {
-        alert("Anda harus login untuk menyimpan transaksi.");
-        return;
-    }
-
-    const type = document.querySelector('input[name="type"]:checked').value;
-    const amountStr = document.getElementById('amount').value;
-    const amount = parseRupiah(amountStr);
-    const description = document.getElementById('description').value;
-    const date = document.getElementById('date').value;
-
-    if (amount <= 0) {
-        alert("Harap masukkan jumlah yang valid (lebih dari 0).");
-        return;
-    }
-
-    const newTransaction = {
-        type: type,
-        amount: amount,
-        description: description,
-        date: date,
-        user_id: currentUser.id // MENYIMPAN ID PENGGUNA YANG SEDANG LOGIN!
-    };
-
-    try {
-        const { data, error } = await db
-            .from('transactions')
-            .insert([newTransaction])
-            .select();
-
-        if (error) {
-            console.error("Gagal menyimpan:", error);
-            alert('Gagal menyimpan transaksi ke database.');
-            return;
-        }
-
-        if (data && data.length > 0) {
-            transactions.push(data[0]);
-        }
-
+async function deleteTx(id) {
+    if (confirm("Hapus transaksi ini?")) {
+        await db.from('transactions').delete().eq('id', id);
+        transactions = transactions.filter(t => t.id !== id);
         applyFilter();
-        closeModal();
-    } catch (err) {
-        console.error("Kesalahan sistem saat menyimpan:", err);
     }
-});
+}
