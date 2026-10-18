@@ -552,11 +552,49 @@ const savingsForm = document.getElementById('savingsForm');
 if (savingsForm) {
     savingsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const title = document.getElementById('savingsTitle').value.trim();
-        const target_amount = parseRupiah(document.getElementById('savingsTargetAmount').value);
-        const { data } = await db.from('savings_goals').insert([{ title, target_amount, current_amount: 0, user_id: currentUser.id }]).select();
-        if (data) { savingsGoals.push(data[0]); document.getElementById('savingsTitle').value = ''; document.getElementById('savingsTargetAmount').value = ''; renderSavingsPage(); }
+        if (!currentUser) return;
+        try {
+            const title = document.getElementById('savingsTitle').value.trim();
+            const target_amount = parseRupiah(document.getElementById('savingsTargetAmount').value);
+            
+            const { data, error } = await db.from('savings_goals').insert([{ title, target_amount, current_amount: 0, user_id: currentUser.id }]).select();
+            
+            if (error) throw error;
+            
+            if (data) { 
+                savingsGoals.push(data[0]); 
+                document.getElementById('savingsForm').reset(); 
+                renderSavingsPage(); 
+            }
+        } catch (err) {
+            await showCustomModal({ title: "Gagal Membuat Target", message: err.message });
+        }
     });
+}
+
+async function addSavingsProgress(id) {
+    const val = await showCustomModal({
+        title: "Setor Tabungan",
+        message: "Masukkan nominal setoran tabungan tambahan (Rp):",
+        isPrompt: true,
+        placeholder: "Contoh: 50.000"
+    });
+    if (!val) return;
+    const amt = parseRupiah(val);
+    if (amt <= 0) return;
+    
+    try {
+        const goal = savingsGoals.find(g => g.id === id);
+        const newCurrent = Number(goal.current_amount) + amt;
+        const { error } = await db.from('savings_goals').update({ current_amount: newCurrent }).eq('id', id);
+        
+        if (error) throw error;
+        
+        goal.current_amount = newCurrent; 
+        renderSavingsPage();
+    } catch (err) {
+        await showCustomModal({ title: "Gagal Setor", message: err.message });
+    }
 }
 
 function renderSavingsPage() {
@@ -600,10 +638,23 @@ const charityForm = document.getElementById('charityForm');
 if (charityForm) {
     charityForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const type = document.getElementById('charityType').value;
-        const amount = parseRupiah(document.getElementById('charityAmount').value);
-        const { data } = await db.from('charity_records').insert([{ type, amount, date: new Date().toISOString().split('T')[0], user_id: currentUser.id }]).select();
-        if (data) { charityRecords.push(data[0]); document.getElementById('charityAmount').value = ''; renderCharityPage(); }
+        if (!currentUser) return;
+        try {
+            const type = document.getElementById('charityType').value;
+            const amount = parseRupiah(document.getElementById('charityAmount').value);
+            
+            const { data, error } = await db.from('charity_records').insert([{ type, amount, date: new Date().toISOString().split('T')[0], user_id: currentUser.id }]).select();
+            
+            if (error) throw error;
+            
+            if (data) { 
+                charityRecords.push(data[0]); 
+                document.getElementById('charityForm').reset(); 
+                renderCharityPage(); 
+            }
+        } catch (err) {
+            await showCustomModal({ title: "Gagal Menyimpan Sedekah", message: err.message });
+        }
     });
 }
 
