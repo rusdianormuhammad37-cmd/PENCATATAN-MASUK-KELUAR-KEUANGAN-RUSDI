@@ -14,3 +14,16 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #233041; 
         }
+            /* TAMBAHAN KODE TRANSISI SMOOTH */
+        #sidebar {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s ease;
+        }
+        #mobileSidebarOverlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        button, a, input, select {
+            transition: all 0.2s ease-in-out;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
