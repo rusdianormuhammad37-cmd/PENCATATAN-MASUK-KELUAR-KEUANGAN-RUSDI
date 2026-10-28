@@ -1,0 +1,93 @@
+ body {
+            background-color: #08325b;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #4d7889; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #233041; 
+        }
+            /* TAMBAHAN KODE TRANSISI SMOOTH */
+        #sidebar {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s ease;
+        }
+        #mobileSidebarOverlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        button, a, input, select {
+            transition: all 0.2s ease-in-out;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        :root {
+            --color-50: #eff6ff; --color-100: #dbeafe; --color-200: #bfdbfe; --color-300: #93c5fd; --color-400: #60a5fa; --color-500: #3b82f6; --color-600: #2563eb; --color-700: #1d4ed8; --color-800: #1e40af; --color-900: #1e3a8a;
+            --login-start: #f8fafc; --login-via: #e2e8f0; --login-end: #cbd5e1;
+            --card-bg-1: #ffffff; --card-bg-2: #f8fafc; --card-bg-3: #f1f5f9; --card-border: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
+        }
+        .dark {
+            --login-start: #1e293b; --login-via: #0f172a; --login-end: #020617;
+            --card-bg-1: #1e293b; --card-bg-2: #0f172a; --card-bg-3: #1e293b; --card-border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8;
+        }
+        body.is-vvip {
+            --color-50: #fffbeb; --color-100: #fef3c7; --color-200: #fde68a; --color-300: #fcd34d; --color-400: #fbbf24; --color-500: #f59e0b; --color-600: #d97706; --color-700: #b45309; --color-800: #92400e; --color-900: #78350f;
+            --login-start: #0f172a; --login-via: #020617; --login-end: #451a03;
+            --card-bg-1: #0f172a; --card-bg-2: #1e293b; --card-bg-3: #0f172a; --card-border: rgba(245, 158, 11, 0.3); --text-main: #ffffff; --text-muted: #cbd5e1;
+        }
+
+        .balance-text { color: var(--text-main); }
+        body.is-vvip .balance-text { color: transparent; background-clip: text; -webkit-background-clip: text; background-image: linear-gradient(to right, var(--color-200), var(--color-400), var(--color-500)); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .sidebar-active { background: rgba(255,255,255,0.08); color: #fff; border-left: 4px solid var(--color-500); }
+        .sidebar-inactive { color: #94a3b8; border-left: 4px solid transparent; }
+        .sidebar-inactive:hover { background: rgba(255,255,255,0.03); color: #e2e8f0; }
+        
+        .vvip-feature { display: none !important; }
+        body.is-vvip .vvip-feature { display: block !important; }
+        body.is-vvip .vvip-feature-flex { display: flex !important; }
+        body.is-vvip .vvip-feature-inline { display: inline-block !important; }
+
+        .non-vvip-feature { display: block !important; }
+        body.is-vvip .non-vvip-feature { display: none !important; }
+        .non-vvip-feature-flex { display: flex !important; }
+        body.is-vvip .non-vvip-feature-flex { display: none !important; }
+
+        #sidebar { transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s ease; }
+        button, a, input, select { transition: all 0.2s ease-in-out; }
+        button:active { transform: scale(0.97); }
+
+        select {
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 1.2rem center; background-size: 1.1rem; padding-right: 2.8rem !important; border-radius: 1.25rem !important; cursor: pointer;
+        }
+        body.is-vvip select { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
+
+            @media print {
+            body > *:not(#mainApp) { display: none !important; }
+            #authContainer, #sidebar, header, #mobileSidebarOverlay { display: none !important; }
+            
+            /* Tambahkan pengaturan height: auto dan overflow: visible pada semua wadah utama */
+            body, #mainApp, #mainContentWrapper, main, #page-report { 
+                display: block !important; 
+                width: 100% !important; 
+                height: auto !important; 
+                overflow: visible !important; 
+                background: white !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                position: relative !important;
+            }
+        }   

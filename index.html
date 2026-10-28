@@ -8,262 +8,488 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <link rel="stylesheet" href="style.css">
     <script>
         tailwind.config = {
             darkMode: 'class', 
             theme: {
                 extend: {
                     fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'], },
-                    colors: { primary: '#4f46e5', success: '#10b981', danger: '#ef4444', vvip: '#0f172a', vvip_light: '#1e293b' }
+                    colors: { 
+                        theme: { 50: 'var(--color-50)', 100: 'var(--color-100)', 200: 'var(--color-200)', 300: 'var(--color-300)', 400: 'var(--color-400)', 500: 'var(--color-500)', 600: 'var(--color-600)', 700: 'var(--color-700)', 800: 'var(--color-800)', 900: 'var(--color-900)' },
+                        loginbg: { start: 'var(--login-start)', via: 'var(--login-via)', end: 'var(--login-end)' }
+                    }
                 }
             }
         }
     </script>
-    <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        .sidebar-active { background: rgba(255,255,255,0.08); color: #fff; border-left: 4px solid #6366f1; }
-        .sidebar-inactive { color: #94a3b8; border-left: 4px solid transparent; }
-        .sidebar-inactive:hover { background: rgba(255,255,255,0.03); color: #e2e8f0; }
-        
-        .vvip-feature { display: none !important; }
-        body.is-vvip .vvip-feature-block { display: block !important; }
-        body.is-vvip .vvip-feature-flex { display: flex !important; }
-        body.is-vvip .vvip-feature-inline { display: inline-block !important; }
-        body.is-vvip .non-vvip-feature { display: none !important; }
-
-        select {
-            appearance: none; -webkit-appearance: none; -moz-appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat; background-position: right 1.2rem center; background-size: 1.1rem;
-            padding-right: 2.8rem !important; border-radius: 1.25rem !important; cursor: pointer; transition: all 0.25s ease;
-        }
-        select:focus { box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15) !important; border-color: #4f46e5 !important; background-color: #ffffff; }
-        .dark select { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
-        .dark select:focus { background-color: #0f172a; border-color: #4f46e5 !important; }
-
-        @media print {
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            body, html { background: white !important; } body > *:not(#mainApp) { display: none !important; }
-            #authContainer, #sidebar, header, .flex-col.gap-6:not(#page-report) { display: none !important; }
-            #mainApp, .flex-1.flex.flex-col, main, #page-report { display: block !important; position: static !important; width: 100% !important; height: auto !important; overflow: visible !important; background: white !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
-            #page-report * { visibility: visible !important; } #page-report button { display: none !important; }
-        }
-    </style>
 </head>
-<body class="text-slate-600 dark:text-slate-300 font-sans antialiased bg-[#f4f7fb] dark:bg-slate-900 h-screen overflow-hidden selection:bg-indigo-100 selection:text-indigo-900 transition-colors duration-300">
+<body class="text-slate-600 dark:text-slate-300 font-sans antialiased bg-[#f4f7fb] dark:bg-slate-900 h-screen overflow-hidden transition-colors duration-300">
 
-<!-- LOGIN -->
-<div id="authContainer" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gradient-to-br from-vvip via-vvip_light to-indigo-950">
-    <div class="bg-white dark:bg-slate-800 p-8 sm:p-10 rounded-[2rem] shadow-2xl w-full max-w-md border border-slate-100 dark:border-slate-700 relative overflow-hidden transition-colors">
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-400 to-amber-600"></div>
-        <div class="text-center mb-8 mt-2">
-            <div class="w-16 h-16 bg-vvip text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg"><i class="fa-solid fa-gem text-2xl"></i></div>
-            <h2 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">NgaturDuit</h2>
-            <p class="text-sm text-slate-400 mt-2 font-medium">Financial Access</p>
+<!-- HALAMAN LOGIN -->
+<div id="authContainer" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-gradient-to-br from-loginbg-start via-loginbg-via to-loginbg-end transition-colors duration-500">
+    <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-5xl flex flex-col md:flex-row overflow-hidden border border-theme-500/20 transition-colors">
+        <div class="md:w-1/2 relative hidden md:flex flex-col justify-end p-10 lg:p-12 overflow-hidden">
+            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618044733300-9472054094ee?q=80&w=1471&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-1000 hover:scale-105"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent"></div>
+            <div class="absolute inset-0 bg-theme-500/10 mix-blend-overlay transition-colors"></div>
+            
+            <div class="relative z-10 text-white">
+                <div class="w-16 h-16 bg-gradient-to-br from-theme-400 to-theme-600 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-theme-500/40 transition-colors">
+                    <i class="fa-solid fa-wallet text-3xl"></i>
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-black mb-4 tracking-tight leading-tight text-slate-100">
+                    Kendalikan Masa Depan Finansial Anda bersama <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500">NgaturDuit</span>.
+                </h2>
+                <div class="w-12 h-1 bg-theme-500 rounded-full mb-5 transition-colors"></div>
+                <p class="text-slate-300 text-sm leading-relaxed font-medium">
+                    Selamat datang di NgaturDuit, asisten keuangan terpercaya Anda. Kami hadir untuk membantu Anda melacak setiap arus kas, mengelola keuangan dengan presisi, dan mewujudkan target impian Anda demi kemerdekaan finansial di masa depan.
+                </p>
+            </div>
         </div>
-        <form id="authForm" class="space-y-5">
-            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-2">Alamat Email</label><div class="relative"><div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-envelope"></i></div><input type="email" id="authEmail" required class="block w-full pl-11 pr-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-vvip text-sm bg-slate-50 dark:bg-slate-700 transition-all font-semibold outline-none text-slate-700 dark:text-white" placeholder="email@anda.com"></div></div>
-            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-2">Kata Sandi</label><div class="relative"><div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-lock"></i></div><input type="password" id="authPassword" required class="block w-full pl-11 pr-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-vvip text-sm bg-slate-50 dark:bg-slate-700 transition-all font-semibold outline-none text-slate-700 dark:text-white" placeholder="Minimal 6 karakter"></div></div>
-            <div class="pt-4 space-y-3"><button type="button" onclick="handleAuth('login')" class="w-full bg-vvip hover:bg-slate-900 text-amber-400 font-bold py-3.5 px-4 rounded-xl shadow-lg transition-all tracking-wide">Masuk Aplikasi</button><button type="button" onclick="handleAuth('register')" class="w-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-white font-bold py-3.5 px-4 rounded-xl transition-all">Daftar Akun Baru</button></div>
-        </form>
+
+        <div class="md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center bg-white dark:bg-slate-800 relative">
+            <div class="text-center mb-8 md:hidden">
+                <div class="w-14 h-14 bg-gradient-to-br from-theme-400 to-theme-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-theme-500/30">
+                    <i class="fa-solid fa-wallet text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-theme-500 to-theme-600 tracking-tight">NgaturDuit</h2>
+            </div>
+            
+            <div class="hidden md:block mb-8">
+                <h3 class="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Akses Masuk</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Silakan masuk untuk melanjutkan ke dashboard keuangan Anda.</p>
+            </div>
+
+            <form id="authForm" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Alamat Email</label>
+                    <div class="relative"><div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-theme-500"><i class="fa-solid fa-envelope"></i></div><input type="email" id="authEmail" required class="block w-full pl-11 pr-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-theme-500 text-sm bg-slate-50 dark:bg-slate-900/50 transition-all font-semibold outline-none text-slate-700 dark:text-white shadow-sm" placeholder="email@anda.com"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Kata Sandi</label>
+                    <div class="relative"><div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-theme-500"><i class="fa-solid fa-lock"></i></div><input type="password" id="authPassword" required class="block w-full pl-11 pr-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-theme-500 text-sm bg-slate-50 dark:bg-slate-900/50 transition-all font-semibold outline-none text-slate-700 dark:text-white shadow-sm" placeholder="Minimal 6 karakter"></div>
+                </div>
+                <div class="pt-4 space-y-3 mt-4">
+                    <button type="button" onclick="handleAuth('login')" class="w-full bg-gradient-to-r from-theme-400 via-theme-500 to-theme-600 hover:from-theme-500 hover:to-theme-700 text-white font-black py-4 px-4 rounded-xl shadow-lg shadow-theme-500/30 transition-all tracking-wide text-sm">Masuk Aplikasi</button>
+                    <button type="button" onclick="handleAuth('register')" class="w-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-white font-bold py-3.5 px-4 rounded-xl transition-all text-sm shadow-sm">Daftar Akun Baru</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="mainApp" class="hidden h-screen w-full flex">
+<!-- APLIKASI UTAMA -->
+<div id="mainApp" class="hidden h-screen w-full flex overflow-hidden">
     <div id="mobileSidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden hidden transition-opacity opacity-0"></div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="bg-[#0f172a] text-slate-300 w-[260px] fixed lg:relative h-full z-50 transform -translate-x-full lg:translate-x-0 transition-all duration-300 flex flex-col shadow-2xl lg:shadow-none border-r border-slate-800/50">
-        <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/80 shrink-0">
-            <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]"><i class="fa-solid fa-gem text-xs"></i></div><h2 class="text-white text-xl font-black tracking-wide">Ngatur<span class="text-indigo-400">Duit</span></h2></div>
+   <aside id="sidebar" class="bg-[#0f172a] text-slate-300 w-[260px] fixed lg:relative h-full z-50 transform -translate-x-full lg:translate-x-0 transition-all duration-300 flex flex-col shadow-2xl lg:shadow-none border-r border-slate-800/50 shrink-0 overflow-hidden">
+        
+        <!-- Logo & Header Sidebar (Diperbaiki presisi tengahnya) -->
+        <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/80 shrink-0 relative overflow-hidden">
+            <div class="vvip-feature absolute -left-10 -top-10 w-32 h-32 bg-amber-500/10 rounded-full blur-[40px] pointer-events-none"></div>
+            
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="non-vvip-feature w-9 h-9 rounded-xl bg-gradient-to-br from-theme-400 to-theme-600 flex items-center justify-center text-white shadow-lg shadow-theme-500/30">
+                    <i class="fa-solid fa-wallet text-sm m-auto"></i>
+                </div>
+                <!-- Logo Mahkota VVIP (Dipusatkan secara absolut dengan flex & m-auto) -->
+                <div class="vvip-feature-flex w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-300 via-amber-500 to-yellow-600 text-slate-950 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.4)] border border-amber-200/50 relative overflow-hidden shrink-0">
+                    <i class="fa-solid fa-crown text-xl animate-pulse drop-shadow-sm"></i>
+                </div>
+
+                <div>
+                    <h2 class="text-white text-lg font-black tracking-wide flex items-center gap-1.5">
+                        Ngatur<span class="non-vvip-feature text-transparent bg-clip-text bg-gradient-to-r from-theme-200 to-theme-400">Duit</span><span class="vvip-feature text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500">Duit</span>
+                    </h2>
+                    <p class="non-vvip-feature text-[10px] text-slate-400 font-semibold tracking-wider">Financial App</p>
+                    <p class="vvip-feature text-[9px] font-black uppercase tracking-[0.2em] text-amber-400/80 flex items-center gap-1">
+                        <i class="fa-solid fa-gem text-[8px]"></i> VVIP Sovereign
+                    </p>
+                </div>
+            </div>
+            
             <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
         
         <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2 custom-scrollbar">
-            <p class="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Menu Utama</p>
+            <p class="px-4 text-[10px] font-black uppercase tracking-widest text-theme-500/70 mb-2">Menu Utama</p>
             <button onclick="switchPage('home')" id="side-home" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-active"><i class="fa-solid fa-house w-5 text-center text-lg"></i> Dashboard</button>
             <button onclick="switchPage('category')" id="side-category" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-inactive"><i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i> Statistik</button>
             <button onclick="switchPage('masterCategory')" id="side-masterCategory" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-inactive"><i class="fa-solid fa-tags w-5 text-center text-lg"></i> Kategori</button>
             <button onclick="switchPage('report')" id="side-report" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-inactive"><i class="fa-solid fa-file-invoice-dollar w-5 text-center text-lg"></i> Laporan</button>
             
-            <div class="non-vvip-feature p-4 mt-6 mx-2 bg-slate-800/50 rounded-xl border border-slate-700/50 text-center cursor-pointer hover:bg-slate-800 transition-colors" onclick="switchPage('profile')"><i class="fa-solid fa-lock text-slate-500 mb-2 text-xl"></i><p class="text-[10px] font-bold text-slate-400">Fitur Spesial Terkunci</p><p class="text-[9px] text-indigo-400 mt-1">Buka di menu profil</p></div>
+            <div class="non-vvip-feature p-4 mt-6 mx-2 bg-slate-800/50 rounded-xl border border-slate-700/50 text-center cursor-pointer hover:bg-slate-800 transition-colors" onclick="switchPage('profile')">
+                <i class="fa-solid fa-lock text-theme-400 mb-2 text-xl"></i>
+                <p class="text-[10px] font-bold text-slate-300">Fitur Spesial Terkunci</p>
+                <p class="text-[9px] text-theme-400 mt-1 font-semibold">Buka di menu profil</p>
+            </div>
 
-            <div class="vvip-feature vvip-feature-block">
-                <p class="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-6 mb-2">Fitur Spesial</p>
-                <button onclick="switchPage('debt')" id="side-debt" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-inactive relative"><i class="fa-solid fa-handshake w-5 text-center text-lg"></i> Utang & Piutang<span class="absolute right-3 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded animate-pulse">!</span></button>
+            <div class="vvip-feature">
+                <p class="px-4 text-[10px] font-black uppercase tracking-widest text-theme-500/70 mt-6 mb-2">Fitur Spesial VVIP</p>
+                <button onclick="switchPage('debt')" id="side-debt" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-inactive"><div class="flex items-center gap-3.5"><i class="fa-solid fa-handshake w-5 text-center text-lg"></i> <span>Utang & Piutang</span></div><span class="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full animate-pulse shadow-sm">!</span></button>
                 <button onclick="switchPage('savings')" id="side-savings" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-inactive"><i class="fa-solid fa-bullseye w-5 text-center text-lg"></i> Target Impian</button>
                 <button onclick="switchPage('charity')" id="side-charity" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-inactive"><i class="fa-solid fa-hand-holding-heart w-5 text-center text-lg"></i> Catat Sedekah</button>
             </div>
 
-            <p class="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-6 mb-2">Pengaturan</p>
+            <p class="px-4 text-[10px] font-black uppercase tracking-widest text-theme-500/70 mt-6 mb-2">Pengaturan</p>
             <button onclick="switchPage('profile')" id="side-profile" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left font-bold text-sm transition-all sidebar-inactive"><i class="fa-solid fa-user-gear w-5 text-center text-lg"></i> Akun & Profil</button>
         </nav>
         
         <div class="p-4 border-t border-slate-800/80 bg-slate-900/50 shrink-0">
             <div class="flex items-center gap-3">
-                <img id="sidebarAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" class="w-10 h-10 rounded-full border border-slate-700 object-cover bg-slate-800">
-                <div class="flex-1 overflow-hidden"><p class="text-sm font-bold text-white truncate" id="sidebarName">NgaturDuit User</p><p class="text-[10px] text-amber-400 font-semibold truncate vvip-feature vvip-feature-block"><i class="fa-solid fa-crown mr-1"></i>VVIP Member</p></div>
+                <img id="sidebarAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" class="w-10 h-10 rounded-full border border-theme-500/30 object-cover bg-slate-800">
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-sm font-extrabold text-white truncate" id="sidebarName">NgaturDuit User</p>
+                    <p class="text-[10px] text-theme-400 font-black tracking-wider truncate vvip-feature"><i class="fa-solid fa-crown mr-1"></i>VVIP MEMBER</p>
+                    <p class="text-[10px] text-slate-400 font-semibold tracking-wider truncate non-vvip-feature">Free Account</p>
+                </div>
                 <button onclick="handleLogout()" class="text-slate-500 hover:text-red-400 p-2 transition-colors" title="Keluar"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </div>
     </aside>
 
-    <!-- KONTEN KANAN -->
-    <div class="flex-1 flex flex-col h-full w-full relative overflow-hidden">
+    <!-- KONTEN UTAMA -->
+    <div id="mainContentWrapper" class="flex-1 flex flex-col h-full w-full relative overflow-hidden">
         <header class="h-20 bg-white dark:bg-slate-800 border-b border-slate-200/80 dark:border-slate-700 flex items-center justify-between px-4 sm:px-8 z-30 shrink-0 shadow-sm transition-colors">
-            <div class="flex items-center gap-4"><button onclick="toggleSidebar()" class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 p-2 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-100 dark:border-slate-600"><i class="fa-solid fa-bars"></i></button><h1 class="text-lg sm:text-xl font-black text-slate-800 dark:text-white tracking-tight hidden sm:block" id="pageTitleHeader">Dashboard Finansial</h1></div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="text-slate-500 dark:text-slate-400 hover:text-theme-500 p-2 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-100 dark:border-slate-600"><i class="fa-solid fa-bars"></i></button>
+                <h1 class="text-lg sm:text-xl font-black text-slate-800 dark:text-white tracking-tight hidden sm:block" id="pageTitleHeader">Dashboard Finansial</h1>
+            </div>
             <div class="flex items-center gap-4 sm:gap-6">
-                <div id="liveTime" class="hidden md:flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-300 bg-slate-50 dark:bg-slate-700 px-4 py-2 rounded-full border border-slate-100 dark:border-slate-600"><i class="fa-regular fa-clock"></i> <span>Memuat...</span></div>
-                <button onclick="toggleTheme()" id="themeToggleBtn" class="text-slate-400 hover:text-indigo-600 dark:hover:text-amber-400 transition-colors"><i class="fa-solid fa-moon text-lg"></i></button>
-                <button onclick="exportDataJSON()" class="text-slate-400 hover:text-indigo-600 transition-colors"><i class="fa-solid fa-cloud-arrow-down text-lg"></i></button>
-                <label class="text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer"><i class="fa-solid fa-cloud-arrow-up text-lg"></i><input type="file" id="importFile" accept=".json" onchange="importDataJSON(this)" class="hidden"></label>
+                <div id="liveTime" class="hidden md:flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-300 bg-slate-50 dark:bg-slate-700 px-4 py-2 rounded-full border border-slate-100 dark:border-slate-600"><i class="fa-regular fa-clock text-theme-500"></i> <span>Memuat...</span></div>
+                <button onclick="toggleTheme()" id="themeToggleBtn" class="text-slate-400 hover:text-theme-500 transition-colors"><i class="fa-solid fa-moon text-lg"></i></button>
+                <button onclick="exportDataJSON()" class="text-slate-400 hover:text-theme-500 transition-colors" title="Backup Data"><i class="fa-solid fa-cloud-arrow-down text-lg"></i></button>
+                <label class="text-slate-400 hover:text-theme-500 transition-colors cursor-pointer" title="Restore Data"><i class="fa-solid fa-cloud-arrow-up text-lg"></i><input type="file" id="importFile" accept=".json" onchange="importDataJSON(this)" class="hidden"></label>
                 <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
-                <div onclick="switchPage('profile')" class="flex items-center gap-2.5 cursor-pointer group"><div class="text-right hidden sm:block"><p class="text-xs font-extrabold text-slate-800 dark:text-white leading-none group-hover:text-indigo-600" id="headerName">User</p><p class="text-[10px] font-bold text-slate-400 mt-1">ID <i class="fa-solid fa-caret-down"></i></p></div><img id="headerAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-600 object-cover bg-slate-50"></div>
+                <div onclick="switchPage('profile')" class="flex items-center gap-2.5 cursor-pointer group">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-extrabold text-slate-800 dark:text-white leading-none group-hover:text-theme-500" id="headerName">User</p>
+                        <p class="text-[10px] font-black text-theme-500 mt-1 vvip-feature">VVIP <i class="fa-solid fa-crown text-[9px]"></i></p>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-1 non-vvip-feature">Standar</p>
+                    </div>
+                    <img id="headerAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" class="w-9 h-9 rounded-full border-2 border-theme-400/50 object-cover bg-slate-50">
+                </div>
             </div>
         </header>
 
         <main class="flex-1 overflow-y-auto p-4 sm:p-8 pb-24 lg:pb-8 custom-scrollbar relative">
+            
             <!-- 1. DASHBOARD -->
             <div id="page-home" class="flex flex-col gap-6 max-w-7xl mx-auto">
-                <div class="vvip-feature vvip-feature-flex bg-gradient-to-r from-vvip via-slate-800 to-indigo-950 rounded-[1.5rem] p-8 sm:p-10 shadow-xl relative overflow-hidden border border-slate-700/50 flex-col justify-center">
-                    <div class="absolute -right-10 -top-24 w-64 h-64 bg-indigo-500 rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
-                    <div class="absolute right-5 bottom-0 opacity-10 pointer-events-none hidden sm:block"><i class="fa-solid fa-crown text-[130px] text-white"></i></div>
+                
+                <div class="non-vvip-feature bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[1.5rem] p-8 sm:p-10 shadow-lg relative overflow-hidden flex flex-col justify-center text-white">
                     <div class="relative z-10">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/10 border border-amber-400/20 text-amber-400 text-[10px] font-black uppercase tracking-widest rounded-lg mb-4"><i class="fa-solid fa-gem"></i> Member Eksklusif</div>
-                        <h2 class="text-3xl sm:text-4xl font-black text-white mb-3 tracking-tight">SELAMAT DATANG DI <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">NGATURDUIT</span></h2>
-                        <p class="text-slate-300 text-sm max-w-xl leading-relaxed font-medium">Ini adalah pusat komando keuangan VVIP Anda. Pantau arus kas, kelola utang piutang, dan wujudkan target impian dengan presisi.</p>
+                        <h2 class="text-3xl sm:text-4xl font-black mb-3 tracking-tight">Halo, Selamat Datang!</h2>
+                        <p class="text-white/90 text-sm max-w-xl leading-relaxed font-medium">Pantau arus kas Anda dengan mudah dan jadikan setiap keputusan finansial lebih terencana bersama NgaturDuit.</p>
                     </div>
                 </div>
 
-                <!-- DASHBOARD CARDS (PUTIH & WARNA-WARNI) -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                    <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between transition-colors">
-                        <div class="flex justify-between items-center relative z-10"><p class="text-sm font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">Total Saldo Aktif <i id="toggleEyeIcon" onclick="toggleBalanceVisibility()" class="fa-solid fa-eye cursor-pointer hover:text-indigo-600"></i></p><div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center"><i class="fa-solid fa-shield-halved text-sm"></i></div></div>
-                        <h2 class="text-3xl sm:text-4xl font-black tracking-tight my-4 text-indigo-600 dark:text-indigo-400 relative z-10" id="dashTotalBalance">Rp 0</h2>
-                        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100 dark:border-slate-700 relative z-10">
-                            <div><p class="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up text-emerald-500"></i> Pemasukan</p><p class="text-sm font-extrabold text-emerald-500 mt-1" id="dashTotalIncome">Rp 0</p></div>
-                            <div><p class="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1"><i class="fa-solid fa-arrow-trend-down text-rose-500"></i> Pengeluaran</p><p class="text-sm font-extrabold text-rose-500 mt-1" id="dashTotalExpense">Rp 0</p></div>
+                <div class="vvip-feature bg-gradient-to-r from-[#0f172a] via-slate-800 to-amber-950 rounded-[1.5rem] p-8 sm:p-10 shadow-xl relative overflow-hidden border border-amber-500/30 flex flex-col justify-center">
+                    <div class="absolute -right-10 -top-24 w-64 h-64 bg-amber-500 rounded-full blur-[80px] opacity-15 pointer-events-none"></div>
+                    <div class="absolute right-5 bottom-0 opacity-10 pointer-events-none hidden sm:block"><i class="fa-solid fa-crown text-[130px] text-amber-400"></i></div>
+                    <div class="relative z-10">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/10 border border-amber-400/20 text-amber-400 text-[10px] font-black uppercase tracking-widest rounded-lg mb-4"><i class="fa-solid fa-gem"></i> Member Eksklusif VVIP</div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-white mb-3 tracking-tight">PENGENDALI KEUANGAN <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500">VVIP</span></h2>
+                        <p class="text-slate-300 text-sm max-w-xl leading-relaxed font-medium">Pusat komando finansial lengkap Anda. Pantau saldo, kelola utang piutang, dan wujudkan impian Anda dengan presisi tinggi.</p>
+                    </div>
+                </div>
+
+                <!-- GRID UTAMA: KARTU SALDO (2 Kolom) & WIDGET UTANG/PIUTANG (1 Kolom) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- KARTU UTAMA SALDO / NET WORTH -->
+                    <div id="mainBalanceCard" class="lg:col-span-2 rounded-[2rem] p-6 sm:p-8 relative overflow-hidden shadow-xl border flex flex-col justify-between transition-all group bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                        
+                        <!-- Efek Cahaya VVIP -->
+                        <div class="vvip-feature absolute -right-16 -top-16 w-64 h-64 bg-gradient-to-br from-amber-400/25 via-yellow-600/10 to-transparent rounded-full blur-[70px] pointer-events-none"></div>
+                        <div class="vvip-feature absolute -left-16 -bottom-16 w-64 h-64 bg-gradient-to-tr from-amber-500/15 via-blue-600/5 to-transparent rounded-full blur-[70px] pointer-events-none"></div>
+                        <div class="vvip-feature absolute right-6 bottom-4 text-amber-400/5 text-8xl pointer-events-none transition-transform duration-700 group-hover:scale-110 hidden sm:block">
+                            <i class="fa-solid fa-crown"></i>
                         </div>
-                        <div class="flex justify-between items-center border-t border-slate-100 dark:border-slate-700 pt-3 mt-3 relative z-10"><p class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-circle-info text-blue-400 mr-1"></i> Seluruh Dompet</p><button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-full shadow-md transition-colors"><i class="fa-solid fa-plus mr-1"></i> Catat</button></div>
+                        
+                        <!-- Header Kartu -->
+                        <div class="flex justify-between items-center relative z-10 mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <div class="non-vvip-feature w-9 h-9 rounded-xl bg-theme-50 dark:bg-theme-900/30 text-theme-600 dark:text-theme-400 border border-theme-500/20 flex items-center justify-center shadow-inner">
+                                    <i class="fa-solid fa-wallet text-sm m-auto"></i>
+                                </div>
+                                <!-- Ikon Dompet VVIP dengan Mahkota (Dipusatkan secara absolut dengan flex & m-auto) -->
+                               <div class="vvip-feature-flex w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-300 via-amber-500 to-yellow-600 text-slate-950 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.4)] border border-amber-200/50 relative overflow-hidden shrink-0">
+                                    <i class="fa-solid fa-wallet text-base"></i>
+                                </div>
+                                
+                                <div>
+                                    <p class="vvip-feature text-[10px] font-black uppercase tracking-[0.2em] text-amber-400/90 flex items-center gap-1.5 mb-0.5">
+                                        <i class="fa-solid fa-crown text-xs text-amber-400 animate-pulse"></i> VVIP Sovereign Card
+                                    </p>
+                                    <p class="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2" id="dashTotalTitle">
+                                        Total Saldo Aktif 
+                                        <i id="toggleEyeIcon" onclick="toggleBalanceVisibility()" class="fa-solid fa-eye cursor-pointer hover:text-theme-500 transition-colors"></i>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <span class="vvip-feature px-4 py-1.5 bg-gradient-to-r from-amber-500/20 via-amber-400/10 to-yellow-600/20 border border-amber-400/50 text-amber-300 text-[10px] font-black uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                                <i class="fa-solid fa-crown text-amber-400 text-xs"></i> VVIP ACCOUNT
+                            </span>
+                        </div>
+                        
+                        <!-- Nominal Net Worth -->
+                        <div class="my-3 relative z-10">
+                            <span class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 block mb-1">Net Worth / Saldo Keseluruhan</span>
+                            <h2 class="text-3xl sm:text-5xl font-black tracking-tight balance-text drop-shadow-sm" id="dashTotalBalance">Rp 0</h2>
+                        </div>
+
+                        <!-- Kotak Pemasukan & Pengeluaran -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-4 border-t border-slate-100 dark:border-slate-700/60 relative z-10" id="dashSubBoxes">
+                            <div class="bg-slate-50 dark:bg-slate-900/50 backdrop-blur-xl p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 shadow-sm" id="boxInc">
+                                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-wider flex items-center gap-2 mb-1">
+                                    <span class="w-5 h-5 rounded-md bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-[10px]" id="iconIncBg"><i class="fa-solid fa-arrow-trend-up"></i></span> 
+                                    Pemasukan Periode Ini
+                                </p>
+                                <p class="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 tracking-tight" id="dashTotalIncome">Rp 0</p>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900/50 backdrop-blur-xl p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 shadow-sm" id="boxExp">
+                                <p class="text-[10px] text-rose-600 dark:text-rose-400 font-black uppercase tracking-wider flex items-center gap-2 mb-1">
+                                    <span class="w-5 h-5 rounded-md bg-red-50 dark:bg-red-900/30 flex items-center justify-center text-[10px]" id="iconExpBg"><i class="fa-solid fa-arrow-trend-down"></i></span> 
+                                    Pengeluaran Periode Ini
+                                </p>
+                                <p class="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400 tracking-tight" id="dashTotalExpense">Rp 0</p>
+                            </div>
+                        </div>
+
+                        <!-- Footer Kartu & Tombol Aksi -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-t border-slate-100 dark:border-slate-700/60 pt-4 mt-4 relative z-10 gap-3" id="dashFooter">
+                            <p class="text-[11px] text-slate-400 font-medium flex items-center gap-1.5" id="dashInfoText">
+                                <i class="fa-solid fa-circle-info text-theme-500"></i> Terakumulasi dari seluruh rekening dompet
+                            </p>
+                            <button onclick="openModal()" class="w-full sm:w-auto text-xs font-black px-6 py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 non-vvip-feature bg-gradient-to-r from-theme-400 via-theme-500 to-theme-600 hover:from-theme-500 hover:to-theme-700 text-white">
+                                <i class="fa-solid fa-plus text-xs"></i> Catat Transaksi
+                            </button>
+                            <button onclick="openModal()" class="w-full sm:w-auto text-xs font-black px-6 py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 vvip-feature bg-gradient-to-r from-amber-300 via-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-700 text-slate-950">
+                                <i class="fa-solid fa-plus text-xs"></i> Catat Transaksi
+                            </button>
+                        </div>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between transition-colors">
-                        <div class="flex justify-between items-center mb-2"><p class="text-sm font-bold text-slate-600 dark:text-slate-300">Piutang (Uang di Luar)</p><button onclick="switchPage('debt')" class="text-teal-500 hover:text-teal-600"><i class="fa-solid fa-arrow-rotate-right"></i></button></div>
-                        <h3 class="text-2xl font-black text-teal-600 dark:text-teal-400 mb-2" id="dashTotalPiutang">Rp 0</h3>
-                        <div id="dashPiutangDetail" class="text-xs text-slate-500 dark:text-slate-400 font-medium mb-3 min-h-[30px]">Belum ada piutang aktif.</div>
-                        <div class="flex items-center gap-4 text-xs font-bold border-t border-slate-100 dark:border-slate-700 pt-3"><span class="text-amber-500 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md" id="dashPiutangUnpaid">0 Belum Lunas</span><span class="text-red-500 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-md" id="dashPiutangOverdue">0 Lewat Tempo</span></div>
+
+                    <!-- PANEL SAMPING KANAN (UTANG & PIUTANG / PROMO) -->
+                    <div class="lg:col-span-1 flex flex-col gap-5">
+                        <div class="vvip-feature flex flex-col gap-5 h-full">
+                            <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between flex-1">
+                                <div class="flex justify-between items-center mb-2"><p class="text-xs font-extrabold text-slate-600 dark:text-slate-300">Piutang (Uang di Luar)</p><button onclick="switchPage('debt')" class="text-theme-500 hover:text-theme-600 text-xs"><i class="fa-solid fa-arrow-rotate-right"></i></button></div>
+                                <h3 class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mb-2" id="dashTotalPiutang">Rp 0</h3>
+                                <div id="dashPiutangDetail" class="text-xs text-slate-500 dark:text-slate-400 font-medium mb-3 min-h-[25px]">Belum ada piutang aktif.</div>
+                                <div class="flex items-center gap-3 text-[11px] font-bold border-t border-slate-100 dark:border-slate-700 pt-3"><span class="text-theme-600 bg-theme-50 dark:bg-theme-900/30 px-2.5 py-1 rounded-md" id="dashPiutangUnpaid">0 Belum Lunas</span><span class="text-red-500 bg-red-50 dark:bg-red-900/30 px-2.5 py-1 rounded-md" id="dashPiutangOverdue">0 Lewat Tempo</span></div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between flex-1">
+                                <div class="flex justify-between items-center mb-2"><p class="text-xs font-extrabold text-slate-600 dark:text-slate-300">Utang (Harus Dibayar)</p><button onclick="switchPage('debt')" class="text-theme-500 hover:text-theme-600 text-xs"><i class="fa-solid fa-arrow-rotate-right"></i></button></div>
+                                <h3 class="text-2xl font-black text-rose-600 dark:text-rose-400 mb-2" id="dashTotalUtang">Rp 0</h3>
+                                <div id="dashUtangDetail" class="text-xs text-slate-500 dark:text-slate-400 font-medium mb-3 min-h-[25px]">Belum ada utang aktif.</div>
+                                <div class="flex items-center gap-3 text-[11px] font-bold border-t border-slate-100 dark:border-slate-700 pt-3"><span class="text-theme-600 bg-theme-50 dark:bg-theme-900/30 px-2.5 py-1 rounded-md" id="dashUtangUnpaid">0 Belum Lunas</span><span class="text-red-500 bg-red-50 dark:bg-red-900/30 px-2.5 py-1 rounded-md" id="dashUtangOverdue">0 Lewat Tempo</span></div>
+                            </div>
+                        </div>
+
+                        <div class="non-vvip-feature bg-white dark:bg-slate-800 rounded-[2rem] p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between h-full text-center">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-crown text-xl"></i></div>
+                                <h4 class="font-black text-slate-800 dark:text-white text-base mb-1">Ingin Fitur Eksklusif?</h4>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">Buka akses VVIP untuk mengelola Utang Piutang, Target Tabungan, Catatan Sedekah, dan Tampilan Emas Mewah.</p>
+                            </div>
+                            <button onclick="switchPage('profile')" class="w-full bg-slate-900 dark:bg-amber-500 text-amber-400 dark:text-slate-950 font-black py-3 rounded-xl text-xs shadow-md transition-all">Masukkan Kode VVIP</button>
+                        </div>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between transition-colors">
-                        <div class="flex justify-between items-center mb-2"><p class="text-sm font-bold text-slate-600 dark:text-slate-300">Utang (Harus Dibayar)</p><button onclick="switchPage('debt')" class="text-orange-500 hover:text-orange-600"><i class="fa-solid fa-arrow-rotate-right"></i></button></div>
-                        <h3 class="text-2xl font-black text-orange-600 dark:text-orange-400 mb-2" id="dashTotalUtang">Rp 0</h3>
-                        <div id="dashUtangDetail" class="text-xs text-slate-500 dark:text-slate-400 font-medium mb-3 min-h-[30px]">Belum ada utang aktif.</div>
-                        <div class="flex items-center gap-4 text-xs font-bold border-t border-slate-100 dark:border-slate-700 pt-3"><span class="text-amber-500 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md" id="dashUtangUnpaid">0 Belum Lunas</span><span class="text-red-500 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-md" id="dashUtangOverdue">0 Lewat Tempo</span></div>
-                    </div>
+
                 </div>
 
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-2">
-                    <div><h3 class="font-extrabold text-slate-800 dark:text-white text-lg">Filter Data & Rekap</h3><p class="text-xs text-slate-500 dark:text-slate-400">Pilih periode waktu pencatatan</p></div>
-                    <div class="flex items-center gap-2 bg-white dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
+                    <div><h3 class="font-extrabold text-slate-800 dark:text-white text-lg">Filter Data & Rekap</h3><p class="text-xs text-slate-400">Pilih periode waktu pencatatan</p></div>
+                    <div class="flex items-center gap-2 bg-white dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
                         <input type="month" id="filterMonth" onchange="applyFilter()" class="px-3 py-1.5 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-lg outline-none text-slate-700 dark:text-slate-200">
                         <div class="relative w-full md:w-48"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-search text-[10px]"></i></div><input type="text" id="searchInput" oninput="applyFilter()" placeholder="Cari..." class="block w-full pl-8 pr-3 py-1.5 rounded-lg text-xs bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 outline-none text-slate-700 dark:text-slate-200"></div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div onclick="openModalWithParam('income')" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-md transition-all group"><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Pemasukan</h4><p class="text-[10px] text-slate-400 mb-4">Catat uang masuk.</p><div class="flex justify-end"><div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><i class="fa-solid fa-money-bill-trend-up"></i></div></div></div>
-                    <div onclick="openModalWithParam('expense')" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:border-red-300 dark:hover:border-red-500 hover:shadow-md transition-all group"><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1 group-hover:text-red-500 dark:group-hover:text-red-400">Pengeluaran</h4><p class="text-[10px] text-slate-400 mb-4">Catat belanja harian.</p><div class="flex justify-end"><div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center"><i class="fa-solid fa-basket-shopping"></i></div></div></div>
-                    <div onclick="openWalletModal()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md transition-all group"><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Dompet</h4><p class="text-[10px] text-slate-400 mb-4">Buat rekening baru.</p><div class="flex justify-end"><div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div></div></div>
-                    <div onclick="switchPage('savings')" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:border-amber-300 dark:hover:border-amber-500 hover:shadow-md transition-all group"><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1 group-hover:text-amber-500 dark:group-hover:text-amber-400">Target Impian</h4><p class="text-[10px] text-slate-400 mb-4">Atur tabungan.</p><div class="flex justify-end"><div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-bullseye"></i></div></div></div>
+                    <div onclick="openModalWithParam('income')" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all group"><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1 group-hover:text-emerald-500">Pemasukan</h4><p class="text-[10px] text-slate-400 mb-4">Catat uang masuk.</p><div class="flex justify-end"><div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><i class="fa-solid fa-money-bill-trend-up"></i></div></div></div>
+                    <div onclick="openModalWithParam('expense')" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:border-red-400 hover:shadow-md transition-all group"><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1 group-hover:text-red-500">Pengeluaran</h4><p class="text-[10px] text-slate-400 mb-4">Catat belanja harian.</p><div class="flex justify-end"><div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center"><i class="fa-solid fa-basket-shopping"></i></div></div></div>
+                    <div onclick="openWalletModal()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:border-theme-400 hover:shadow-md transition-all group"><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1 group-hover:text-theme-500">Dompet</h4><p class="text-[10px] text-slate-400 mb-4">Buat rekening baru.</p><div class="flex justify-end"><div class="w-8 h-8 rounded-lg bg-theme-50 dark:bg-theme-900/30 text-theme-500 flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div></div></div>
+                    <div onclick="switchPage('profile')" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 cursor-pointer hover:border-amber-400 hover:shadow-md transition-all group"><h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1 group-hover:text-amber-500">Akses VVIP</h4><p class="text-[10px] text-slate-400 mb-4">Buka fitur penuh.</p><div class="flex justify-end"><div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center"><i class="fa-solid fa-crown"></i></div></div></div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-96 transition-colors"><div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-700/30"><div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h3 class="font-extrabold text-slate-800 dark:text-white text-sm">Pemasukan Terakhir</h3></div></div><div class="flex-1 overflow-y-auto p-2 custom-scrollbar" id="listPemasukanDashboard"></div></div>
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-96 transition-colors"><div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-700/30"><div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center"><i class="fa-solid fa-money-bill-transfer"></i></div><div><h3 class="font-extrabold text-slate-800 dark:text-white text-sm">Pengeluaran Terakhir</h3></div></div><div class="flex-1 overflow-y-auto p-2 custom-scrollbar" id="listPengeluaranDashboard"></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-96"><div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-700/30"><div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><i class="fa-solid fa-hand-holding-dollar"></i></div><h3 class="font-extrabold text-slate-800 dark:text-white text-sm">Pemasukan Terakhir</h3></div><div class="flex-1 overflow-y-auto p-2 custom-scrollbar" id="listPemasukanDashboard"></div></div>
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-96"><div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-700/30"><div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center"><i class="fa-solid fa-money-bill-transfer"></i></div><h3 class="font-extrabold text-slate-800 dark:text-white text-sm">Pengeluaran Terakhir</h3></div><div class="flex-1 overflow-y-auto p-2 custom-scrollbar" id="listPengeluaranDashboard"></div></div>
                 </div>
                 
-                <section class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6 mt-2 transition-colors">
+                <section class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6 mt-2">
                     <div class="flex justify-between items-center mb-5 pb-4 border-b border-slate-100 dark:border-slate-700">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-theme-50 dark:bg-theme-900/30 text-theme-600 dark:text-theme-400 flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div>
                             <div><h3 class="font-extrabold text-slate-800 dark:text-white text-base">DOMPET & REKENING</h3><p class="text-xs text-slate-400 font-medium">Kelola saldo berbagai rekening Anda</p></div>
                         </div>
-                        <button onclick="openWalletModal()" class="bg-vvip hover:bg-slate-800 text-amber-400 px-4 py-2 rounded-xl text-xs font-bold shadow-sm flex items-center gap-2"><i class="fa-solid fa-plus"></i> Tambah Dompet</button>
+                        <button onclick="openWalletModal()" class="bg-gradient-to-r from-theme-400 to-theme-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm flex items-center gap-2"><i class="fa-solid fa-plus"></i> Tambah Dompet</button>
                     </div>
                     <div id="walletCardList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </section>
             </div>
 
-            <!-- HALAMAN LAINNYA -->
+            <!-- HALAMAN STATISTIK -->
             <div id="page-category" class="hidden flex-col gap-6 max-w-5xl mx-auto">
-                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 transition-colors">
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
                         <div><h3 class="font-extrabold text-slate-800 dark:text-white text-lg">Rekapitulasi Keuangan</h3><p class="text-xs text-slate-400">Analisis rekap harian, bulanan, dan tahunan</p></div>
                         <div class="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                            <button onclick="switchRekapTab('daily')" id="rekapBtn-daily" class="px-4 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-300 transition-all">Harian</button>
-                            <button onclick="switchRekapTab('monthly')" id="rekapBtn-monthly" class="px-4 py-2 text-xs font-bold rounded-lg text-slate-500 dark:text-slate-400 transition-all">Bulanan</button>
-                            <button onclick="switchRekapTab('yearly')" id="rekapBtn-yearly" class="px-4 py-2 text-xs font-bold rounded-lg text-slate-500 dark:text-slate-400 transition-all">Tahunan</button>
+                            <button onclick="switchRekapTab('daily')" id="rekapBtn-daily" class="px-4 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-theme-600 dark:text-theme-300">Harian</button>
+                            <button onclick="switchRekapTab('monthly')" id="rekapBtn-monthly" class="px-4 py-2 text-xs font-bold rounded-lg text-slate-500">Bulanan</button>
+                            <button onclick="switchRekapTab('yearly')" id="rekapBtn-yearly" class="px-4 py-2 text-xs font-bold rounded-lg text-slate-500">Tahunan</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 text-[11px] uppercase text-slate-400 font-extrabold tracking-wider"><th class="px-5 py-3.5" id="rekapHeaderPeriode">Periode</th><th class="px-5 py-3.5 text-right text-emerald-600 dark:text-emerald-400">Pemasukan</th><th class="px-5 py-3.5 text-right text-red-500 dark:text-red-400">Pengeluaran</th><th class="px-5 py-3.5 text-right">Selisih (Net)</th></tr></thead><tbody id="rekapTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm font-semibold"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 text-[11px] uppercase text-slate-400 font-extrabold"><th class="px-5 py-3.5" id="rekapHeaderPeriode">Periode</th><th class="px-5 py-3.5 text-right text-emerald-600">Pemasukan</th><th class="px-5 py-3.5 text-right text-red-500">Pengeluaran</th><th class="px-5 py-3.5 text-right">Selisih (Net)</th></tr></thead><tbody id="rekapTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm font-semibold"></tbody></table></div>
                 </div>
-                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 transition-colors"><h3 class="font-extrabold text-slate-800 dark:text-white text-lg mb-4">Grafik Arus Kas Harian</h3><div class="relative h-72 w-full"><canvas id="dashboardChart"></canvas></div></div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors"><div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 font-extrabold text-slate-800 dark:text-white">Distribusi Pengeluaran</div><div class="p-6"><div id="expenseCategoryList" class="space-y-5"></div></div></div><div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors"><div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 font-extrabold text-slate-800 dark:text-white">Sumber Pemasukan</div><div class="p-6"><div id="incomeCategoryList" class="space-y-5"></div></div></div></div>
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6"><h3 class="font-extrabold text-slate-800 dark:text-white text-lg mb-4">Grafik Arus Kas Harian</h3><div class="relative h-72 w-full"><canvas id="dashboardChart"></canvas></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 font-extrabold text-slate-800 dark:text-white">Distribusi Pengeluaran</div><div class="p-6"><div id="expenseCategoryList" class="space-y-5"></div></div></div><div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 font-extrabold text-slate-800 dark:text-white">Sumber Pemasukan</div><div class="p-6"><div id="incomeCategoryList" class="space-y-5"></div></div></div></div>
             </div>
 
-            <!-- MASTER KATEGORI DENGAN SEARCH & GROUPING -->
+            <!-- MASTER KATEGORI -->
             <div id="page-masterCategory" class="hidden flex-col gap-6 max-w-4xl mx-auto">
-                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8 transition-colors">
-                    <h3 class="text-xl font-extrabold text-slate-800 dark:text-white mb-2">Master Kategori Transaksi</h3>
-                    <p class="text-xs text-slate-400 mb-6">Kelola jenis kategori pemasukan dan pengeluaran Anda</p>
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-6 gap-4">
+                        <div>
+                            <h3 class="text-xl font-extrabold text-slate-800 dark:text-white mb-2">Master Kategori</h3>
+                            <p class="text-xs text-slate-400">Kelola dan cari riwayat kategori transaksi</p>
+                        </div>
+                        <div class="relative w-full sm:w-64">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-search text-xs"></i>
+                            </div>
+                            <!-- Fungsi oninput akan memanggil renderMasterCategories secara realtime saat mengetik -->
+                            <input type="text" id="searchCategoryInput" oninput="renderMasterCategories()" placeholder="Cari kategori (mis: Makanan)..." class="block w-full pl-9 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 font-semibold outline-none text-slate-700 dark:text-white transition-all focus:border-theme-400">
+                        </div>
+                    </div>
                     <form id="categoryForm" class="flex flex-col sm:flex-row gap-4 mb-8">
-                        <div class="flex-1"><input type="text" id="newCategoryName" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 focus:ring-2 focus:ring-vvip font-semibold text-slate-800 dark:text-white outline-none" placeholder="Nama Kategori Baru..."></div>
+                        <div class="flex-1"><input type="text" id="newCategoryName" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold text-slate-800 dark:text-white outline-none" placeholder="Nama Kategori Baru..."></div>
                         <div class="w-full sm:w-48"><select id="newCategoryType" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-800 dark:text-white"><option value="expense">Pengeluaran</option><option value="income">Pemasukan</option></select></div>
-                        <button type="submit" class="w-full sm:w-auto bg-vvip hover:bg-slate-900 text-white text-sm font-bold px-6 py-3 rounded-xl shadow-md transition-all">Tambah</button>
+                        <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-theme-400 to-theme-600 text-white text-sm font-black px-6 py-3 rounded-xl shadow-md">Tambah</button>
+                    </form>
+                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-700/50 border-y border-slate-100 dark:border-slate-700 text-[11px] uppercase text-slate-400 font-extrabold"><th class="px-5 py-4">Kategori</th><th class="px-5 py-4">Jenis</th><th class="px-5 py-4 text-center">Aksi</th></tr></thead><tbody id="masterCategoryList" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm font-semibold"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- LAPORAN -->
+            <div id="page-report" class="hidden flex-col gap-6 max-w-5xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                    <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-5 mb-5"><h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Laporan Laba Rugi</h3><button onclick="window.print()" class="text-xs font-bold border border-slate-200 dark:border-slate-600 hover:bg-slate-55 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-lg"><i class="fa-solid fa-print mr-1"></i> Cetak</button></div>
+                    <div class="space-y-6 text-sm font-medium">
+                        <div><h4 class="font-bold text-emerald-600 uppercase text-xs tracking-widest mb-3">Pendapatan Operasional</h4><div id="reportIncomeRows" class="space-y-3 pl-4 border-l-2 border-emerald-100 dark:border-emerald-900/30"></div><div class="flex justify-between font-extrabold pt-4 border-t border-slate-100 dark:border-slate-700 mt-4 text-slate-800 dark:text-white"><span>Total Pendapatan</span><span id="reportTotalIncome" class="text-emerald-600">Rp 0</span></div></div>
+                        <div><h4 class="font-bold text-red-500 uppercase text-xs tracking-widest mb-3">Beban Operasional</h4><div id="reportExpenseRows" class="space-y-3 pl-4 border-l-2 border-red-100 dark:border-red-900/30"></div><div class="flex justify-between font-extrabold pt-4 border-t border-slate-100 dark:border-slate-700 mt-4 text-slate-800 dark:text-white"><span>Total Beban</span><span id="reportTotalExpense" class="text-red-500">Rp 0</span></div></div>
+                        <div class="bg-[var(--card-bg-2)] p-5 rounded-xl flex justify-between items-center font-black text-lg mt-6 text-[var(--text-main)] shadow-inner border border-slate-200"><span id="netProfitLabel">Laba Bersih</span><span id="reportNetProfit" class="text-theme-500">Rp 0</span></div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8"><h3 class="text-xl font-extrabold text-slate-800 dark:text-white mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">Buku Besar (General Ledger)</h3><div id="generalLedgerContainer" class="space-y-6"></div></div>
+            </div>
+
+            <!-- HALAMAN UTANG & PIUTANG -->
+            <div id="page-debt" class="hidden flex-col gap-6 max-w-6xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                    <h3 class="text-xl font-extrabold text-slate-800 dark:text-white mb-2">Pencatatan Utang / Piutang</h3>
+                    <p class="text-xs text-slate-400 mb-6">Pencatatan ini akan langsung memotong/menambah saldo dompet atau saldo utama Anda secara otomatis.</p>
+                    
+                    <form id="debtForm" onsubmit="event.preventDefault(); submitDebtForm();" class="space-y-4 mb-8 mt-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                            <div class="lg:col-span-1"><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1.5">Nama Pihak</label><input type="text" id="debtPerson" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-800 dark:text-white" placeholder="Contoh: Budi"></div>
+                            <div class="lg:col-span-1"><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1.5">Jenis Transaksi</label><select id="debtType" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-800 dark:text-white"><option value="payable">Saya Berutang (Uang Masuk)</option><option value="receivable">Orang Berutang (Uang Keluar)</option></select></div>
+                            <div class="lg:col-span-1"><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1.5">Sumber Dompet</label><select id="debtWalletSelect" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-800 dark:text-white"></select></div>
+                            <div class="lg:col-span-1"><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1.5">Nominal (Rp)</label><input type="text" id="debtAmount" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-800 dark:text-white" placeholder="Nominal" oninput="formatRupiahInput(this)"></div>
+                            <div class="lg:col-span-1"><label class="block text-[10px] font-bold uppercase text-slate-400 mb-1.5">Jatuh Tempo</label><input type="date" id="debtDueDate" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-700 dark:text-white"></div>
+                        </div>
+                        <div class="flex justify-end pt-2"><button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-theme-400 to-theme-600 text-white text-sm font-black px-8 py-3 rounded-xl shadow-md">Catat Utang / Piutang</button></div>
                     </form>
                     
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="relative w-full">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-search text-xs"></i></div>
-                            <input type="text" id="searchMasterCategory" oninput="renderMasterCategories()" placeholder="Cari nama kategori..." class="block w-full pl-10 pr-4 py-3 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 outline-none text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-vvip font-semibold">
+                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 text-[11px] uppercase text-slate-400 font-extrabold"><th class="px-5 py-4">Nama Pihak</th><th class="px-5 py-4">Jenis</th><th class="px-5 py-4 text-right">Nominal</th><th class="px-5 py-4">Jatuh Tempo</th><th class="px-5 py-4 text-center">Status</th><th class="px-5 py-4 text-center">Aksi</th></tr></thead><tbody id="debtTableList" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm font-semibold"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- TARGET IMPIAN -->
+            <div id="page-savings" class="hidden flex-col gap-6 max-w-5xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                    <h3 class="text-xl font-extrabold text-slate-800 dark:text-white mb-2">Target Tabungan & Impian</h3>
+                    <form id="savingsForm" class="flex flex-col sm:flex-row gap-4 mb-8 mt-5">
+                        <div class="flex-1"><input type="text" id="savingsTitle" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold text-slate-800 dark:text-white outline-none" placeholder="Nama Impian..."></div>
+                        <div class="flex-1"><input type="text" id="savingsTargetAmount" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold text-slate-800 dark:text-white outline-none" placeholder="Target Nominal (Rp)" oninput="formatRupiahInput(this)"></div>
+                        <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-theme-400 to-theme-600 text-white text-sm font-black px-6 py-3 rounded-xl shadow-md">Buat Target</button>
+                    </form>
+                    <div id="savingsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+                </div>
+            </div>
+
+            <!-- CATAT SEDEKAH -->
+            <div id="page-charity" class="hidden flex-col gap-6 max-w-5xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                    <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-5 mb-5"><h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Catatan Sedekah</h3><div class="bg-theme-50 dark:bg-theme-900/30 text-theme-600 dark:text-theme-400 border border-theme-200 px-4 py-2 rounded-xl text-xs font-black shadow-sm">Total Amal: <span id="totalCharityAmount">Rp 0</span></div></div>
+                    <form id="charityForm" class="space-y-4 mb-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Jenis Amal</label><select id="charityType" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-800 dark:text-white"><option value="Sedekah Harian">Sedekah Harian</option><option value="Zakat">Zakat</option><option value="Infak Masjid">Infak Masjid</option><option value="Donasi Sosial">Donasi Sosial</option></select></div>
+                            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Sumber Dana</label><select id="charityWalletSelect" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-800 dark:text-white"></select></div>
                         </div>
-                    </div>
-
-                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-700/50 border-y border-slate-100 dark:border-slate-700 text-[11px] uppercase text-slate-400 font-extrabold tracking-wider"><th class="px-5 py-4">Nama Kategori</th><th class="px-5 py-4">Jenis</th><th class="px-5 py-4 text-center">Aksi</th></tr></thead><tbody id="masterCategoryList" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm font-semibold"></tbody></table></div>
+                        <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Nominal (Rp)</label><input type="text" id="charityAmount" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none text-slate-800 dark:text-white" placeholder="Nominal" oninput="formatRupiahInput(this)"></div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-theme-400 to-theme-600 text-white text-sm font-black px-6 py-3 rounded-xl shadow-md">Catat Amal</button>
+                    </form>
+                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 text-[11px] uppercase text-slate-400 font-extrabold"><th class="px-5 py-4">Tanggal</th><th class="px-5 py-4">Kategori Penyaluran</th><th class="px-5 py-4 text-right">Jumlah</th><th class="px-5 py-4 text-center">Aksi</th></tr></thead><tbody id="charityTableList" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm font-semibold"></tbody></table></div>
                 </div>
             </div>
-
-            <div id="page-report" class="hidden flex-col gap-6 max-w-5xl mx-auto">
-                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8 transition-colors">
-                    <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-5 mb-5"><h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Laporan Laba Rugi</h3><button onclick="window.print()" class="text-xs font-bold border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-lg transition-all"><i class="fa-solid fa-print mr-1"></i> Cetak Laporan</button></div>
-                    <div class="space-y-6 text-sm font-medium">
-                        <div><h4 class="font-bold text-emerald-600 uppercase text-xs tracking-widest mb-3">Pendapatan Operasional</h4><div id="reportIncomeRows" class="space-y-3 pl-4 border-l-2 border-emerald-100 dark:border-emerald-900/30"></div><div class="flex justify-between font-extrabold pt-4 border-t border-slate-100 dark:border-slate-700 mt-4 text-slate-800 dark:text-white"><span>Total Pendapatan</span><span id="reportTotalIncome" class="text-emerald-600 dark:text-emerald-400">Rp 0</span></div></div>
-                        <div><h4 class="font-bold text-red-500 uppercase text-xs tracking-widest mb-3">Beban Operasional</h4><div id="reportExpenseRows" class="space-y-3 pl-4 border-l-2 border-red-100 dark:border-red-900/30"></div><div class="flex justify-between font-extrabold pt-4 border-t border-slate-100 dark:border-slate-700 mt-4 text-slate-800 dark:text-white"><span>Total Beban</span><span id="reportTotalExpense" class="text-red-500 dark:text-red-400">Rp 0</span></div></div>
-                        <div class="bg-gradient-to-r from-vvip to-indigo-950 p-5 rounded-xl flex justify-between items-center font-black text-lg mt-6 text-white shadow-md"><span id="netProfitLabel">Laba / Rugi Bersih</span><span id="reportNetProfit" class="text-amber-400">Rp 0</span></div>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8 transition-colors"><h3 class="text-xl font-extrabold text-slate-800 dark:text-white mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">Buku Besar (General Ledger)</h3><div id="generalLedgerContainer" class="space-y-6"></div></div>
-            </div>
-
-            <div id="page-debt" class="hidden flex-col gap-6 max-w-5xl mx-auto"><div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8 transition-colors"><h3 class="text-xl font-extrabold text-slate-800 dark:text-white mb-2">Pencatatan Utang / Piutang</h3><form id="debtForm" onsubmit="event.preventDefault(); submitDebtForm();" class="flex flex-col sm:flex-row gap-4 mb-8 mt-5 flex-wrap"><div class="flex-1 min-w-[200px]"><input type="text" id="debtPerson" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none focus:ring-2 focus:ring-vvip text-slate-800 dark:text-white" placeholder="Nama Pihak..."></div><div class="w-full sm:w-48"><select id="debtType" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none focus:ring-2 focus:ring-vvip text-slate-800 dark:text-white"><option value="payable">Saya Berutang</option><option value="receivable">Orang Berutang</option></select></div><div class="flex-1 min-w-[150px]"><input type="text" id="debtAmount" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none focus:ring-2 focus:ring-vvip text-slate-800 dark:text-white" placeholder="Nominal (Rp)" oninput="formatRupiahInput(this)"></div><div class="w-full sm:w-44"><input type="date" id="debtDueDate" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none focus:ring-2 focus:ring-vvip text-slate-700 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"></div><button type="submit" class="w-full sm:w-auto bg-vvip hover:bg-slate-900 text-white text-sm font-bold px-6 py-3 rounded-xl shadow-md transition-all cursor-pointer">Catat</button></form><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 text-[11px] uppercase text-slate-400 font-extrabold tracking-wider"><th class="px-5 py-4">Nama Pihak</th><th class="px-5 py-4">Jenis</th><th class="px-5 py-4 text-right">Nominal</th><th class="px-5 py-4">Jatuh Tempo</th><th class="px-5 py-4 text-center">Status</th><th class="px-5 py-4 text-center">Aksi</th></tr></thead><tbody id="debtTableList" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm font-semibold"></tbody></table></div></div></div>
-            <div id="page-savings" class="hidden flex-col gap-6 max-w-5xl mx-auto"><div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8 transition-colors"><h3 class="text-xl font-extrabold text-slate-800 dark:text-white mb-2">Target Tabungan & Impian</h3><form id="savingsForm" class="flex flex-col sm:flex-row gap-4 mb-8 mt-5"><div class="flex-1"><input type="text" id="savingsTitle" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none focus:ring-2 focus:ring-vvip text-slate-800 dark:text-white" placeholder="Nama Impian..."></div><div class="flex-1"><input type="text" id="savingsTargetAmount" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none focus:ring-2 focus:ring-vvip text-slate-800 dark:text-white" placeholder="Target Nominal (Rp)" oninput="formatRupiahInput(this)"></div><button type="submit" class="w-full sm:w-auto bg-vvip hover:bg-slate-900 text-white text-sm font-bold px-6 py-3 rounded-xl shadow-md">Buat Target</button></form><div id="savingsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div></div></div>
-            <div id="page-charity" class="hidden flex-col gap-6 max-w-5xl mx-auto"><div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8 transition-colors"><div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-5 mb-5"><h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Catatan Sedekah</h3><div class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50 px-4 py-2 rounded-xl text-xs font-bold shadow-sm">Total Amal: <span id="totalCharityAmount">Rp 0</span></div></div><form id="charityForm" class="flex flex-col sm:flex-row gap-4 mb-6"><div class="flex-1"><select id="charityType" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none focus:ring-2 focus:ring-vvip text-slate-800 dark:text-white"><option value="Sedekah Harian">Sedekah Harian</option><option value="Zakat">Zakat</option><option value="Infak Masjid">Infak Masjid</option><option value="Donasi Sosial">Donasi Sosial</option></select></div><div class="flex-1"><input type="text" id="charityAmount" required class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-700 font-semibold outline-none focus:ring-2 focus:ring-vvip text-slate-800 dark:text-white" placeholder="Nominal (Rp)" oninput="formatRupiahInput(this)"></div><button type="submit" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold px-6 py-3 rounded-xl shadow-md">Catat Amal</button></form><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 text-[11px] uppercase text-slate-400 font-extrabold tracking-wider"><th class="px-5 py-4">Tanggal</th><th class="px-5 py-4">Kategori Penyaluran</th><th class="px-5 py-4 text-right">Jumlah</th><th class="px-5 py-4 text-center">Aksi</th></tr></thead><tbody id="charityTableList" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm font-semibold"></tbody></table></div></div></div>
 
             <!-- PROFIL -->
             <div id="page-profile" class="hidden flex-col gap-6 max-w-3xl mx-auto">
-                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8 transition-colors">
-                    <div class="flex flex-col sm:flex-row items-center gap-6 border-b border-slate-100 dark:border-slate-700 pb-6 mb-6 text-center sm:text-left"><div class="w-24 h-24 rounded-full overflow-hidden border-4 border-indigo-50 dark:border-slate-700 shadow-md bg-indigo-50 dark:bg-slate-700 shrink-0"><img id="profileAvatarLarge" src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" alt="Profil" class="w-full h-full object-cover"></div><div><h3 class="text-2xl font-extrabold text-slate-800 dark:text-white" id="profileHeaderName">Pengguna Akun</h3><p class="text-sm text-slate-400 font-medium mt-1" id="profileEmailSubtitle">-</p><span class="inline-block mt-2 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase rounded-lg border border-amber-200 dark:border-amber-800/50 vvip-feature vvip-feature-inline"><i class="fa-solid fa-crown mr-1"></i> VVIP Member</span></div></div>
-                    <form id="profileForm" class="space-y-5"><div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Nama Lengkap</label><input type="text" id="profileFullName" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip"></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Ubah Foto</label><input type="file" id="profileImageFile" accept="image/*" onchange="initImageCropper(this)" class="w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-vvip file:text-amber-400 file:font-bold cursor-pointer bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-1 outline-none text-slate-500 dark:text-slate-300"></div></div><div id="cropContainer" class="hidden bg-slate-50 dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4"><div class="flex justify-center"><canvas id="cropCanvas" width="180" height="180" class="rounded-full shadow-md border-4 border-white dark:border-slate-700 bg-white cursor-grab"></canvas></div><div><input type="range" id="zoomRange" step="0.01" oninput="adjustZoom(this.value)" class="w-full accent-vvip"></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">No. Whatsapp</label><input type="text" id="profilePhone" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip"></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Profesi</label><input type="text" id="profileJob" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip"></div></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Alamat Lengkap</label><textarea id="profileAddress" rows="2" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip"></textarea></div><div class="flex justify-end pt-3"><button type="submit" class="bg-vvip hover:bg-slate-900 text-amber-400 font-bold text-sm px-8 py-3.5 rounded-xl shadow-md transition-all">Simpan Profil</button></div></form>
+                <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row items-center gap-6 border-b border-slate-100 dark:border-slate-700 pb-6 mb-6 text-center sm:text-left">
+                        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-theme-400/40 shadow-md bg-theme-50 shrink-0"><img id="profileAvatarLarge" src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" alt="Profil" class="w-full h-full object-cover"></div>
+                        <div>
+                            <h3 class="text-2xl font-extrabold text-slate-800 dark:text-white" id="profileHeaderName">Pengguna Akun</h3>
+                            <p class="text-sm text-slate-400 font-medium mt-1" id="profileEmailSubtitle">-</p>
+                            <span class="inline-block mt-2 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase rounded-lg border border-amber-300 vvip-feature"><i class="fa-solid fa-crown mr-1"></i> VVIP Member</span>
+                            <span class="inline-block mt-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-black uppercase rounded-lg border border-blue-300 non-vvip-feature">Free Account</span>
+                        </div>
+                    </div>
+                    
+                    <form id="profileForm" class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Nama Lengkap</label><input type="text" id="profileFullName" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none"></div>
+                            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Ubah Foto</label><input type="file" id="profileImageFile" accept="image/*" onchange="initImageCropper(this)" class="w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-theme-500 file:text-white file:font-black cursor-pointer bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-1 text-slate-500"></div>
+                        </div>
+                        <div id="cropContainer" class="hidden bg-slate-50 dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4"><div class="flex justify-center"><canvas id="cropCanvas" width="180" height="180" class="rounded-full shadow-md border-4 border-theme-400/50 bg-white cursor-grab"></canvas></div><div><input type="range" id="zoomRange" step="0.01" oninput="adjustZoom(this.value)" class="w-full accent-theme-500"></div></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">No. Whatsapp</label><input type="text" id="profilePhone" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none"></div>
+                            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Profesi</label><input type="text" id="profileJob" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none"></div>
+                        </div>
+                        <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Alamat Lengkap</label><textarea id="profileAddress" rows="2" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none"></textarea></div>
+                        <div class="flex justify-end pt-3"><button type="submit" class="bg-gradient-to-r from-theme-400 to-theme-600 text-white font-black text-sm px-8 py-3.5 rounded-xl shadow-md">Simpan Profil</button></div>
+                    </form>
                     
                     <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 flex flex-col items-center">
-                        <p class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Akses Tersembunyi</p>
-                        <button type="button" onclick="activateVvipCode()" class="bg-slate-900 dark:bg-black text-amber-400 hover:text-amber-300 px-6 py-2.5 rounded-xl text-xs font-black shadow-lg hover:shadow-amber-500/20 transition-all border border-amber-900/30 flex items-center gap-2"><i class="fa-solid fa-lock"></i> Masukkan Kode Akses VVIP</button>
+                        <p class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Status Akses Aplikasi</p>
+                        <button type="button" onclick="activateVvipCode()" class="non-vvip-feature bg-slate-900 dark:bg-black text-amber-400 hover:text-amber-300 px-6 py-2.5 rounded-xl text-xs font-black shadow-lg border border-amber-500/30 flex items-center gap-2">
+                            <i class="fa-solid fa-lock"></i> Masukkan Kode Akses VVIP
+                        </button>
+                        <button type="button" onclick="deactivateVvip()" class="vvip-feature bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 px-6 py-2.5 rounded-xl text-xs font-black shadow-sm border border-red-200 items-center gap-2">
+                            <i class="fa-solid fa-unlock"></i> Batalkan Akses VVIP (Kembali ke Standar)
+                        </button>
+                    </div>
+                    <!-- Bagian Status Akses Aplikasi yang sudah ada -->
+                    <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 flex flex-col items-center">
+                        <p class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Status Akses Aplikasi</p>
+                        <!-- ... tombol VVIP ... -->
+                    </div>
+
+                    <!-- TAMBAHKAN KODE INI: ZONA BERBAHAYA (RESET DATA) -->
+                    <div class="mt-8 pt-6 border-t border-red-100 dark:border-red-900/30 flex flex-col items-center">
+                        <p class="text-xs font-bold text-red-500 mb-3 uppercase tracking-wider">Zona Berbahaya</p>
+                        <button type="button" onclick="resetAllData()" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white px-6 py-2.5 rounded-xl text-xs font-black shadow-sm border border-red-200 dark:border-red-800 flex items-center gap-2 transition-colors">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Reset Seluruh Data Aplikasi
+                        </button>
+                        <p class="text-[10px] text-slate-400 mt-2 text-center max-w-xs leading-relaxed">Peringatan: Tindakan ini akan menghapus semua riwayat transaksi, dompet, utang, dan target secara permanen.</p>
                     </div>
                 </div>
             </div>
@@ -271,10 +497,56 @@
     </div>
 </div>
 
-<!-- MODALS -->
-<div id="transactionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex justify-center items-end sm:items-center p-4 transition-opacity opacity-0"><div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden transform transition-transform translate-y-full sm:translate-y-4 border border-slate-100 dark:border-slate-700" id="modalContent"><div class="px-7 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-700/30"><h3 class="text-lg font-extrabold text-slate-800 dark:text-white">Form Transaksi</h3><button onclick="closeModal()" class="text-slate-400 hover:text-slate-800 dark:hover:text-white bg-white dark:bg-slate-700 shadow-sm border border-slate-100 dark:border-slate-600 rounded-full w-9 h-9 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button></div><form id="transactionForm" class="p-7 space-y-5"><div class="grid grid-cols-2 gap-3 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700"><label class="cursor-pointer relative"><input type="radio" name="type" value="income" class="peer sr-only" checked onchange="updateCategoryOptions()"><div class="text-center py-2.5 rounded-lg peer-checked:bg-white dark:peer-checked:bg-slate-800 peer-checked:shadow-sm peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400 text-slate-500 font-bold text-sm transition-all">Pemasukan</div></label><label class="cursor-pointer relative"><input type="radio" name="type" value="expense" class="peer sr-only" onchange="updateCategoryOptions()"><div class="text-center py-2.5 rounded-lg peer-checked:bg-white dark:peer-checked:bg-slate-800 peer-checked:shadow-sm peer-checked:text-red-500 dark:peer-checked:text-red-400 text-slate-500 font-bold text-sm transition-all">Pengeluaran</div></label></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Pilih Kategori</label><select id="category" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip"></select></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Pilih Dompet / Rekening</label><select id="walletSelect" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip"></select></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Nominal (Rp)</label><input type="text" id="amount" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-extrabold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip" placeholder="0" oninput="formatRupiahInput(this)"></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Catatan / Keterangan</label><input type="text" id="description" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip" placeholder="Contoh: Gaji / Belanja..."></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Tanggal</label><input type="date" id="date" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-vvip [color-scheme:light] dark:[color-scheme:dark]"></div><div class="pt-2"><button type="submit" class="w-full bg-vvip hover:bg-slate-900 text-amber-400 font-bold py-3.5 px-4 rounded-xl shadow-md transition-all tracking-wide">Simpan Data</button></div></form></div></div>
-<div id="walletModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex justify-center items-center p-4 transition-opacity opacity-0"><div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden transform transition-transform scale-95 border border-slate-100 dark:border-slate-700" id="walletModalContent"><div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-700/30"><h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa-solid fa-wallet text-indigo-500"></i> Tambah Dompet</h3><button onclick="closeWalletModal()" class="text-slate-400 hover:text-slate-800 dark:hover:text-white bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 shadow-sm rounded-full w-8 h-8 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark text-base"></i></button></div><form id="walletForm" onsubmit="event.preventDefault(); submitWalletForm();" class="p-6 space-y-4"><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Nama Rekening</label><input type="text" id="walletNameInput" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip" placeholder="Contoh: BSI, DANA..."></div><div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Saldo Awal (Rp)</label><input type="text" id="walletBalanceInput" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-extrabold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-vvip" placeholder="0" oninput="formatRupiahInput(this)"></div><div class="pt-2"><button type="submit" class="w-full bg-vvip hover:bg-slate-900 text-amber-400 font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm tracking-wide">Simpan Dompet</button></div></form></div></div>
-<div id="customConfirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden flex justify-center items-center p-4 transition-opacity opacity-0"><div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden transform transition-transform scale-95 border border-slate-100 dark:border-slate-700 p-6 text-center" id="customConfirmContent"><div id="confirmIconContainer" class="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl shadow-inner"><i class="fa-solid fa-triangle-exclamation" id="confirmIcon"></i></div><h3 id="confirmTitle" class="text-lg font-extrabold text-slate-800 dark:text-white mb-2">Konfirmasi</h3><p id="confirmMessage" class="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed font-medium">Lanjutkan tindakan ini?</p><div id="confirmInputWrapper" class="mb-6 hidden"><input type="text" id="customPromptInput" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-700 outline-none focus:ring-2 focus:ring-vvip text-slate-800 dark:text-white" placeholder=""></div><div class="flex gap-3"><button id="confirmCancelBtn" onclick="closeCustomModal(false)" class="flex-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-3 px-4 rounded-xl text-xs transition-all">Batal</button><button id="confirmOkBtn" onclick="closeCustomModal(true)" class="flex-1 bg-vvip hover:bg-slate-900 text-amber-400 font-bold py-3 px-4 rounded-xl text-xs transition-all shadow-md">Lanjutkan</button></div></div></div>
+<!-- MODAL TRANSAKSI -->
+<div id="transactionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex justify-center items-end sm:items-center p-4 opacity-0 transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden transform translate-y-full sm:translate-y-4 transition-transform border border-theme-500/20" id="modalContent">
+        <div class="px-7 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-700/30">
+            <h3 class="text-lg font-extrabold text-slate-800 dark:text-white">Form Transaksi</h3>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-800 dark:hover:text-white bg-white dark:bg-slate-700 rounded-full w-9 h-9 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <form id="transactionForm" class="p-7 space-y-5">
+            <div class="grid grid-cols-2 gap-3 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                <label class="cursor-pointer relative"><input type="radio" name="type" value="income" class="peer sr-only" checked onchange="updateCategoryOptions()"><div class="text-center py-2.5 rounded-lg peer-checked:bg-white dark:peer-checked:bg-slate-800 peer-checked:shadow-sm peer-checked:text-emerald-600 text-slate-500 font-bold text-sm">Pemasukan</div></label>
+                <label class="cursor-pointer relative"><input type="radio" name="type" value="expense" class="peer sr-only" onchange="updateCategoryOptions()"><div class="text-center py-2.5 rounded-lg peer-checked:bg-white dark:peer-checked:bg-slate-800 peer-checked:shadow-sm peer-checked:text-red-500 text-slate-500 font-bold text-sm">Pengeluaran</div></label>
+            </div>
+            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Pilih Kategori</label><select id="category" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-white outline-none"></select></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Pilih Dompet / Sumber Dana</label><select id="walletSelect" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-white outline-none"></select></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Nominal (Rp)</label><input type="text" id="amount" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-extrabold text-slate-800 dark:text-white outline-none" placeholder="0" oninput="formatRupiahInput(this)"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Catatan / Keterangan</label><input type="text" id="description" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-white outline-none" placeholder="Contoh: Gaji / Belanja"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Tanggal</label><input type="date" id="date" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-700 dark:text-white outline-none"></div>
+            <div class="pt-2"><button type="submit" class="w-full bg-gradient-to-r from-theme-400 to-theme-600 text-white font-black py-3.5 px-4 rounded-xl shadow-md text-sm">Simpan Data</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL DOMPET -->
+<div id="walletModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden flex justify-center items-center p-4 opacity-0 transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden scale-95 transition-transform border border-theme-500/20" id="walletModalContent">
+        <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-700/30">
+            <h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa-solid fa-wallet text-theme-500"></i> Tambah Dompet</h3>
+            <button onclick="closeWalletModal()" class="text-slate-400 hover:text-slate-800 dark:hover:text-white bg-white dark:bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="walletForm" onsubmit="event.preventDefault(); submitWalletForm();" class="p-6 space-y-4">
+            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Nama Rekening</label><input type="text" id="walletNameInput" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-white outline-none" placeholder="Contoh: BCA, DANA"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Saldo Awal (Rp)</label><input type="text" id="walletBalanceInput" required class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-sm font-extrabold text-slate-800 dark:text-white outline-none" placeholder="0" oninput="formatRupiahInput(this)"></div>
+            <div class="pt-2"><button type="submit" class="w-full bg-gradient-to-r from-theme-400 to-theme-600 text-white font-black py-3 px-4 rounded-xl shadow-md text-sm">Simpan Dompet</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL KONFIRMASI -->
+<div id="customConfirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden flex justify-center items-center p-4 opacity-0 transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden scale-95 transition-transform border border-theme-500/20 p-6 text-center" id="customConfirmContent">
+        <div class="w-14 h-14 bg-theme-50 dark:bg-theme-900/30 text-theme-600 dark:text-theme-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl shadow-inner"><i class="fa-solid fa-triangle-exclamation" id="confirmIcon"></i></div>
+        <h3 id="confirmTitle" class="text-lg font-extrabold text-slate-800 dark:text-white mb-2">Konfirmasi</h3>
+        <p id="confirmMessage" class="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed font-medium">Lanjutkan tindakan ini?</p>
+        <div id="confirmInputWrapper" class="mb-6 hidden"><input type="text" id="customPromptInput" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white outline-none" placeholder=""></div>
+        <div class="flex gap-3">
+            <button id="confirmCancelBtn" onclick="closeCustomModal(false)" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 px-4 rounded-xl text-xs">Batal</button>
+            <button id="confirmOkBtn" onclick="closeCustomModal(true)" class="flex-1 bg-gradient-to-r from-theme-400 to-theme-600 text-white font-black py-3 px-4 rounded-xl text-xs shadow-md">Lanjutkan</button>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
